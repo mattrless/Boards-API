@@ -1,0 +1,189 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model SystemRole {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+
+  users     User[]
+
+  systemRoleSystemPermissions SystemRoleSystemPermission[]
+  @@map("system_roles")
+}
+
+model User {
+  id            Int         @id @default(autoincrement())
+  email         String      @unique
+  password      String
+
+  profileId     Int         @unique @map("profile_id")
+  profile       Profile     @relation(fields: [profileId], references: [id])
+
+  systemRoleId  Int         @map("system_role_id")
+  systemRole    SystemRole  @relation(fields: [systemRoleId], references: [id])
+
+  ownedBoards   Board[]
+
+  userBoards     UserBoard[]
+
+  cardAssignments CardAssignment[]
+
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Profile {
+  id        Int      @id @default(autoincrement())
+  name      String
+  avatar    String?
+
+  user      User?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("profiles")
+}
+
+model Permission {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  type        PermissionType
+
+  systemRoleSystemPermissions SystemRoleSystemPermission[]
+  boardRoleBoardPermissions   BoardRoleBoardPermission[]
+
+  @@map("permissions")
+}
+
+enum PermissionType {
+  SYSTEM
+  BOARD
+}
+
+model SystemRoleSystemPermission {
+  systemRoleId Int @map("system_role_id")
+  permissionId Int @map("permission_id")
+
+  systemRole SystemRole @relation(fields: [systemRoleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([systemRoleId, permissionId])
+  @@map("system_role_system_permission")
+}
+
+model Board {
+  id        Int      @id @default(autoincrement())
+  name      String
+
+  ownerId   Int      @map("owner_id")
+  owner     User     @relation(fields: [ownerId], references: [id])
+
+  userBoards UserBoard[]
+
+  lists     List[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("boards")
+}
+
+model BoardRole {
+  id          Int      @id @default(autoincrement())
+  name        String
+
+  userBoards  UserBoard[]
+  boardRoleBoardPermissions   BoardRoleBoardPermission[]
+  
+  @@map("board_roles")
+}
+
+model UserBoard {
+  boardId   Int         @map("board_id")
+  board     Board       @relation(fields: [boardId], references: [id])
+
+  userId    Int         @map("user_id")
+  user      User        @relation(fields: [userId], references: [id])
+
+  boardRoleId Int       @map("board_role_id")
+  boardRole  BoardRole @relation(fields: [boardRoleId], references: [id])
+
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  @@id([boardId, userId])
+  @@map("user_board")
+}
+
+model BoardRoleBoardPermission {
+  boardRoleId Int @map("board_role_id")
+  permissionId Int @map("permission_id")
+
+  boardRole   BoardRole   @relation(fields: [boardRoleId], references: [id])
+  permission  Permission  @relation(fields: [permissionId], references: [id])
+
+  @@id([boardRoleId, permissionId])
+  @@map("board_role_board_permission")
+}
+
+model List {
+  id         Int      @id @default(autoincrement())
+  title      String
+  position   Int
+
+  boardId    Int      @map("board_id")
+  board      Board    @relation(fields: [boardId], references: [id])
+
+  cards      Card[]
+
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("lists")
+}
+
+model Card {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  position    Int
+
+  listId      Int      @map("list_id")
+  list        List     @relation(fields: [listId], references: [id])
+
+  cardAssignments CardAssignment[]
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("cards")
+}
+
+model CardAssignment {
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+
+  cardId      Int      @map("card_id")
+  card        Card     @relation(fields: [cardId], references: [id])
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@id([userId, cardId])
+  @@map("card_assignments")
+}
