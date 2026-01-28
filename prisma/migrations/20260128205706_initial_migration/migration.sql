@@ -134,6 +134,9 @@ CREATE UNIQUE INDEX "users_profile_id_key" ON "users"("profile_id");
 -- CreateIndex
 CREATE UNIQUE INDEX "permissions_name_key" ON "permissions"("name");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "board_roles_name_key" ON "board_roles"("name");
+
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "profiles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
