@@ -1,2 +1,14 @@
-### Init
-GET http://localhost:3000/
+### Get users
+GET http://localhost:3000/users
+
+### Create user
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "email":"user3@local.dev",
+  "password":"12345",
+  "profile" : {
+    "name": "Carlos"    
+  }
+}

@@ -9,6 +9,11 @@ export class PrismaService extends PrismaClient {
       adapter: new PrismaPg({
         connectionString: process.env.DATABASE_URL,
       }),
+      omit: {
+        user: {
+          password: true,
+        },
+      } as const,
     });
   }
 }
