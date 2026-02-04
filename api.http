@@ -1,14 +1,50 @@
 ### Get users
 GET http://localhost:3000/users
 
+### Get user by id
+GET http://localhost:3000/users/1
+
 ### Create user
 POST http://localhost:3000/users
 Content-Type: application/json
 
 {
-  "email":"user3@local.dev",
+  "email":"user6@local.dev",
   "password":"12345",
   "profile" : {
     "name": "Carlos"    
   }
 }
+
+### Update by admin
+PUT http://localhost:3000/users/8
+Content-Type: application/json
+
+{
+  "email": "userl@local.dev",
+  "password": "probandotodo",
+  "profile": {  
+    "name": "CarlosEd",
+    "avatar": "https://example.com/avatar.png"
+  },
+  "systemRoleId": 2
+}
+
+### Self update
+PUT http://localhost:3000/users/8/me
+Content-Type: application/json
+
+{
+  "email": "user8@local.dev",
+  "password": "probandotodo",
+  "profile": {  
+    "name": "CarlosEdSelf",
+    "avatar": "https://exampleSelf.com/avatar.png"
+  }  
+}
+
+### Delete user
+DELETE http://localhost:3000/users/5
+
+### Restore user
+PUT http://localhost:3000/users/5/restore

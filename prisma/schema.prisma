@@ -43,6 +43,7 @@ model User {
 
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at")
+  deletedAt     DateTime?
 
   @@map("users")
 }
@@ -100,6 +101,7 @@ model Board {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  deletedAt DateTime?
 
   @@map("boards")
 }
