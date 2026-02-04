@@ -1,64 +1,85 @@
-### Login
-POST http://localhost:3000/auth/login
+@baseUrl = http://localhost:3000
+@userToken = Bearer TOKEN
+@adminToken = Bearer TOKEN
+
+### =========================
+### AUTH
+### =========================
+
+### Login (user / admin)
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email":"userN@local.dev",
-  "password":"12345"
+  "email": "user3@local.dev",
+  "password": "12345"
 }
 
-### Get users
-GET http://localhost:3000/users
-Authorization: Bearer TOKEN
+### =========================
+### USERS (SELF)
+### =========================
+
+### Get all users (admin or authorized)
+GET {{baseUrl}}/users
+Authorization: {{adminToken}}
 
 ### Get user by id
-GET http://localhost:3000/users/1
+GET {{baseUrl}}/users/1
+Authorization: {{adminToken}}
 
-### Create user
-POST http://localhost:3000/users
+### Create user (public)
+POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
-  "email":"userN@local.dev",
-  "password":"12345",
-  "profile" : {
-    "name": "Carlos"    
+  "email": "userN@local.dev",
+  "password": "12345",
+  "profile": {
+    "name": "Carlos"
   }
 }
 
-### Update by admin
-PUT http://localhost:3000/users/8
+### Self update
+PUT {{baseUrl}}/users/me
+Authorization: {{userToken}}
 Content-Type: application/json
-Authorization: Bearer 
+
+{
+  "email": "user8@local.dev",
+  "password": "probandotodo",
+  "profile": {
+    "name": "CarlosEdSelf",
+    "avatar": "https://exampleSelf.com/avatar.png"
+  }
+}
+
+### Self delete (soft delete)
+DELETE {{baseUrl}}/users/me
+Authorization: {{userToken}}
+
+### =========================
+### ADMIN – USERS
+### =========================
+
+### Admin update user
+PUT {{baseUrl}}/admin/users/8
+Authorization: {{adminToken}}
+Content-Type: application/json
 
 {
   "email": "userl@local.dev",
   "password": "probandotodo",
-  "profile": {  
+  "profile": {
     "name": "CarlosEd",
     "avatar": "https://example.com/avatar.png"
   },
   "systemRoleId": 2
 }
 
-### Self update
-PUT http://localhost:3000/users/8/me
-Content-Type: application/json
-Authorization: Bearer 
+### Admin delete user (soft delete)
+DELETE {{baseUrl}}/admin/users/5
+Authorization: {{adminToken}}
 
-{
-  "email": "user8@local.dev",
-  "password": "probandotodo",
-  "profile": {  
-    "name": "CarlosEdSelf",
-    "avatar": "https://exampleSelf.com/avatar.png"
-  }  
-}
-
-### Delete user
-DELETE http://localhost:3000/users/10
-Authorization: Bearer TOKEN
-
-### Restore user
-PUT http://localhost:3000/users/10/restore
-Authorization: Bearer TOKEN
+### Restore user (admin)
+PUT {{baseUrl}}/admin/users/12/restore
+Authorization: {{adminToken}}

@@ -8,12 +8,14 @@ import {
   ParseIntPipe,
   Put,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthUser } from 'src/auth/types/auth-user.type';
+import type { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -37,32 +39,18 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Put(':id/me')
-  userUpdate(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.usersService.updateSelf(id, updateUserDto);
+  @Put('/me')
+  userUpdate(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
+    const user = req.user as AuthUser;
+    const userId = user.id;
+    return this.usersService.updateSelf(userId, updateUserDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Put(':id')
-  adminUpdate(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() adminUpdateUserDto: AdminUpdateUserDto,
-  ) {
-    return this.usersService.adminUpdate(id, adminUpdateUserDto);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove(id);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Put(':id/restore')
-  restore(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.restore(id);
+  @Delete('/me')
+  removeMe(@Req() req: Request) {
+    const user = req.user as AuthUser;
+    const userId = user.id;
+    return this.usersService.remove(userId);
   }
 }
