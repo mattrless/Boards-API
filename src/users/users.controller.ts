@@ -8,15 +8,12 @@ import {
   ParseIntPipe,
   Put,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthUser } from 'src/auth/types/auth-user.type';
-import type { Request } from 'express';
-
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -40,17 +37,16 @@ export class UsersController {
 
   @UseGuards(AuthGuard('jwt'))
   @Put('/me')
-  userUpdate(@Req() req: Request, @Body() updateUserDto: UpdateUserDto) {
-    const user = req.user as AuthUser;
-    const userId = user.id;
+  userUpdate(
+    @CurrentUser('id') userId: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.usersService.updateSelf(userId, updateUserDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('/me')
-  removeMe(@Req() req: Request) {
-    const user = req.user as AuthUser;
-    const userId = user.id;
+  removeMe(@CurrentUser('id') userId: number) {
     return this.usersService.remove(userId);
   }
 }
