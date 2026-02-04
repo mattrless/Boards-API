@@ -213,6 +213,21 @@ export class UsersService {
     );
   }
 
+  async getUserByEmail(email: string) {
+    const user = await this.prismaService.user.findFirst({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return user;
+  }
+
   private async getDefaultSystemRoleId() {
     const systemRole = await this.prismaService.systemRole.findFirst({
       where: {
