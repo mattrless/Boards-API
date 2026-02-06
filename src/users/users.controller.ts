@@ -43,7 +43,7 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   @Permissions('user_update_self')
   @Put('/me')
-  userUpdate(
+  updateMe(
     @CurrentUser('id') userId: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
