@@ -8,30 +8,23 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
-  console.log('Seeding...');
-
   await prisma.systemRole.createMany({
     data: [{ name: 'admin' }, { name: 'user' }],
     skipDuplicates: true,
   });
 
-  await prisma.boardRole.createMany({
-    data: [{ name: 'owner' }, { name: 'member' }],
-    skipDuplicates: true,
-  });
-
   await prisma.permission.createMany({
     data: [
-      // SYSTEM
-      { name: 'manage_users', type: PermissionType.SYSTEM },
-      { name: 'manage_system_roles', type: PermissionType.SYSTEM },
+      // USER – shared (admin + user)
+      { name: 'user_create', type: PermissionType.SYSTEM },
+      { name: 'user_read', type: PermissionType.SYSTEM },
+      { name: 'user_update_self', type: PermissionType.SYSTEM },
+      { name: 'user_delete_self', type: PermissionType.SYSTEM },
 
-      // BOARD
-      { name: 'create_board', type: PermissionType.BOARD },
-      { name: 'update_board', type: PermissionType.BOARD },
-      { name: 'delete_board', type: PermissionType.BOARD },
-      { name: 'manage_lists', type: PermissionType.BOARD },
-      { name: 'manage_cards', type: PermissionType.BOARD },
+      // USER – admin only
+      { name: 'user_update_any', type: PermissionType.SYSTEM },
+      { name: 'user_delete_any', type: PermissionType.SYSTEM },
+      { name: 'user_restore', type: PermissionType.SYSTEM },
     ],
     skipDuplicates: true,
   });
@@ -40,37 +33,58 @@ async function main() {
     where: { name: 'admin' },
   });
 
-  const systemPermissions = await prisma.permission.findMany({
-    where: { type: PermissionType.SYSTEM },
+  const userRole = await prisma.systemRole.findUnique({
+    where: { name: 'user' },
   });
 
-  if (adminRole) {
-    await prisma.systemRoleSystemPermission.createMany({
-      data: systemPermissions.map((permission) => ({
-        systemRoleId: adminRole.id,
-        permissionId: permission.id,
-      })),
-      skipDuplicates: true,
-    });
+  if (!adminRole || !userRole) {
+    throw new Error('System roles not found');
   }
 
-  const ownerRole = await prisma.boardRole.findUnique({
-    where: { name: 'owner' },
+  const adminPermissions = await prisma.permission.findMany({
+    where: {
+      name: {
+        in: [
+          'user_create',
+          'user_read',
+          'user_update_self',
+          'user_delete_self',
+          'user_update_any',
+          'user_delete_any',
+          'user_restore',
+        ],
+      },
+    },
   });
 
-  const boardPermissions = await prisma.permission.findMany({
-    where: { type: PermissionType.BOARD },
+  const userPermissions = await prisma.permission.findMany({
+    where: {
+      name: {
+        in: [
+          'user_create',
+          'user_read',
+          'user_update_self',
+          'user_delete_self',
+        ],
+      },
+    },
   });
 
-  if (ownerRole) {
-    await prisma.boardRoleBoardPermission.createMany({
-      data: boardPermissions.map((permission) => ({
-        boardRoleId: ownerRole.id,
-        permissionId: permission.id,
-      })),
-      skipDuplicates: true,
-    });
-  }
+  await prisma.systemRoleSystemPermission.createMany({
+    data: adminPermissions.map((permission) => ({
+      systemRoleId: adminRole.id,
+      permissionId: permission.id,
+    })),
+    skipDuplicates: true,
+  });
+
+  await prisma.systemRoleSystemPermission.createMany({
+    data: userPermissions.map((permission) => ({
+      systemRoleId: userRole.id,
+      permissionId: permission.id,
+    })),
+    skipDuplicates: true,
+  });
 
   const adminProfile = await prisma.profile.upsert({
     where: { id: 1 },
@@ -81,26 +95,23 @@ async function main() {
     },
   });
 
-  if (adminRole) {
-    await prisma.user.upsert({
-      where: { email: 'admin@local.dev' },
-      update: {},
-      create: {
-        email: 'admin@local.dev',
-        password:
-          '$2b$10$6tCJm9jtxnya/5XEgjsOwOsRNRqHRaRIftDdc/hHc3pRgu0h/Dx3C',
-        profileId: adminProfile.id,
-        systemRoleId: adminRole.id,
-      },
-    });
-  }
+  await prisma.user.upsert({
+    where: { email: 'admin@local.dev' },
+    update: {},
+    create: {
+      email: 'admin@local.dev',
+      password: '$2b$10$6tCJm9jtxnya/5XEgjsOwOsRNRqHRaRIftDdc/hHc3pRgu0h/Dx3C',
+      profileId: adminProfile.id,
+      systemRoleId: adminRole.id,
+    },
+  });
 
-  console.log('Done');
+  console.log('Seeding finished');
 }
 
 main()
-  .catch((e) => {
-    console.error('Seeding failed', e);
+  .catch((error) => {
+    console.error('❌ Seeding failed', error);
     process.exit(1);
   })
   .finally(async () => {

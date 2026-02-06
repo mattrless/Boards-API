@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:3000
-@userToken = Bearer TOKEN
-@adminToken = Bearer TOKEN
+@userToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc3MDM5NTAxMywiZXhwIjoxNzcwNTY3ODEzfQ.Zif3UNqRyWVLt390Yh8oKP0N1vGY3e6Sw2_tVCpoJWE
+@adminToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc3MDM5NTM0MiwiZXhwIjoxNzcwNTY4MTQyfQ.E2dtM82DMXQ85lAljRmndWECYDMj_0SwZtgNOou1MnY
 
 ### =========================
 ### AUTH
@@ -11,7 +11,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "user3@local.dev",
+  "email": "admin@local.dev",
   "password": "12345"
 }
 
@@ -19,12 +19,12 @@ Content-Type: application/json
 ### USERS (SELF)
 ### =========================
 
-### Get all users (admin or authorized)
+### Get all users
 GET {{baseUrl}}/users
-Authorization: {{adminToken}}
+Authorization: {{userToken}}
 
 ### Get user by id
-GET {{baseUrl}}/users/1
+GET {{baseUrl}}/users/2
 Authorization: {{adminToken}}
 
 ### Create user (public)
@@ -32,7 +32,7 @@ POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
-  "email": "userN@local.dev",
+  "email": "userP@local.dev",
   "password": "12345",
   "profile": {
     "name": "Carlos"
@@ -44,8 +44,7 @@ PUT {{baseUrl}}/users/me
 Authorization: {{userToken}}
 Content-Type: application/json
 
-{
-  "email": "user8@local.dev",
+{  
   "password": "probandotodo",
   "profile": {
     "name": "CarlosEdSelf",
@@ -77,9 +76,9 @@ Content-Type: application/json
 }
 
 ### Admin delete user (soft delete)
-DELETE {{baseUrl}}/admin/users/5
+DELETE {{baseUrl}}/admin/users/2
 Authorization: {{adminToken}}
 
 ### Restore user (admin)
-PUT {{baseUrl}}/admin/users/12/restore
+PUT {{baseUrl}}/admin/users/2/restore
 Authorization: {{adminToken}}

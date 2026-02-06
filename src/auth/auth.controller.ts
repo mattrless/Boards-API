@@ -12,6 +12,7 @@ export class AuthController {
   @Post('login')
   login(@Req() req: Request) {
     const user = req.user as User;
+
     return {
       user,
       access_token: this.authService.generateToken(user),

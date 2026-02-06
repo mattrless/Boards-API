@@ -14,6 +14,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Permissions } from '../auth/decorators/permissions.decorator';
+import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
+
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -23,19 +26,22 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('user_read')
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Permissions('user_read')
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findOne(id);
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Permissions('user_update_self')
   @Put('/me')
   userUpdate(
     @CurrentUser('id') userId: number,
@@ -45,6 +51,7 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Permissions('user_delete_self')
   @Delete('/me')
   removeMe(@CurrentUser('id') userId: number) {
     return this.usersService.remove(userId);
