@@ -2,13 +2,14 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserResponseDto } from './respose-user.dto';
 import { Expose } from 'class-transformer';
 
-@Expose()
 export class LoginResponseDto {
   @ApiProperty({ type: UserResponseDto })
+  @Expose()
   user: UserResponseDto;
 
   @ApiProperty({
-    example: 'gfdhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    example: 'gfdhbGciOiJfdre1NiIsInR5cCI6IkpXVCJ9...',
   })
+  @Expose()
   access_token: string;
 }

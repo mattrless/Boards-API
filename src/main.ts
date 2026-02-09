@@ -17,6 +17,17 @@ async function bootstrap() {
     .setTitle('Boards API')
     .setDescription('API to consolidate NestJS knowledge.')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Requires JWT token',
+        in: 'header',
+      },
+      'JWT',
+    )
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory, {
