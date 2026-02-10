@@ -13,6 +13,11 @@ async function main() {
     skipDuplicates: true,
   });
 
+  await prisma.boardRole.createMany({
+    data: [{ name: 'admin' }, { name: 'member' }],
+    skipDuplicates: true,
+  });
+
   await prisma.permission.createMany({
     data: [
       // USER – shared (admin + user)
@@ -20,6 +25,13 @@ async function main() {
       { name: 'user_read', type: PermissionType.SYSTEM },
       { name: 'user_update_self', type: PermissionType.SYSTEM },
       { name: 'user_delete_self', type: PermissionType.SYSTEM },
+
+      // BOARD
+      { name: 'board_create', type: PermissionType.SYSTEM },
+      { name: 'board_delete', type: PermissionType.SYSTEM },
+      { name: 'board_read', type: PermissionType.SYSTEM },
+      { name: 'board_update', type: PermissionType.SYSTEM },
+      { name: 'board_restore', type: PermissionType.SYSTEM },
 
       // USER – admin only
       { name: 'user_update_any', type: PermissionType.SYSTEM },
@@ -52,6 +64,11 @@ async function main() {
           'user_update_any',
           'user_delete_any',
           'user_restore',
+          'board_create',
+          'board_delete',
+          'board_read',
+          'board_update',
+          'board_restore',
         ],
       },
     },
@@ -65,6 +82,11 @@ async function main() {
           'user_read',
           'user_update_self',
           'user_delete_self',
+          'board_create',
+          'board_delete',
+          'board_read',
+          'board_update',
+          'board_restore',
         ],
       },
     },

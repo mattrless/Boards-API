@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
-export class UserResponseDto {
+export class LoginUserResponseDto {
   @ApiProperty({
     example: 1,
   })

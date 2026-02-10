@@ -92,8 +92,6 @@ export class UsersService {
   }
 
   async updateSelf(userId: number, updateUserDto: UpdateUserDto) {
-    await this.ensureUserExists(userId);
-
     const data: Prisma.UserUpdateInput = {
       email: updateUserDto.email,
       password: updateUserDto.password
@@ -131,8 +129,6 @@ export class UsersService {
   }
 
   async adminUpdate(userId: number, adminUpdateUserDto: AdminUpdateUserDto) {
-    await this.ensureUserExists(userId);
-
     const data: Prisma.UserUpdateInput = {
       email: adminUpdateUserDto.email,
       password: adminUpdateUserDto.password
@@ -176,7 +172,6 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    await this.ensureUserExists(id);
     await this.prismaService.user.update({
       where: { id },
       data: { deletedAt: new Date() },
@@ -242,17 +237,6 @@ export class UsersService {
     }
 
     return systemRole.id;
-  }
-
-  private async ensureUserExists(id: number) {
-    const exists = await this.prismaService.user.findFirst({
-      where: { id },
-      select: { id: true },
-    });
-
-    if (!exists) {
-      throw new NotFoundException('User not found');
-    }
   }
 
   private async hashPassword(password: string) {

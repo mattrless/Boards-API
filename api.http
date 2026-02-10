@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:3000
-@userToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc3MDM5NTAxMywiZXhwIjoxNzcwNTY3ODEzfQ.Zif3UNqRyWVLt390Yh8oKP0N1vGY3e6Sw2_tVCpoJWE
-@adminToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc3MDM5NTM0MiwiZXhwIjoxNzcwNTY4MTQyfQ.E2dtM82DMXQ85lAljRmndWECYDMj_0SwZtgNOou1MnY
+@userToken = Bearer TOKEN
+@adminToken = Bearer TOKEN
 
 ### =========================
 ### AUTH
@@ -76,9 +76,46 @@ Content-Type: application/json
 }
 
 ### Admin delete user (soft delete)
-DELETE {{baseUrl}}/admin/users/2
+DELETE {{baseUrl}}/admin/users/10
 Authorization: {{adminToken}}
 
 ### Restore user (admin)
 PUT {{baseUrl}}/admin/users/2/restore
 Authorization: {{adminToken}}
+
+
+### BOARDS
+### Create board
+POST {{baseUrl}}/boards
+Authorization: {{userToken}}
+Content-Type: application/json
+
+{
+  "name": "board de prueba2"
+}
+
+### Get all boards
+GET {{baseUrl}}/boards
+Authorization: {{userToken}}
+
+### Get board by id
+GET {{baseUrl}}/boards/7
+Authorization: {{userToken}}
+
+### Update board
+PUT {{baseUrl}}/boards/70
+Authorization: {{userToken}}
+Content-Type: application/json
+
+{
+  "name": "board de pruebad",
+  "ownerId": 40
+}
+
+### Soft delete board by id
+DELETE {{baseUrl}}/boards/7
+Authorization: {{userToken}}
+
+### Restore board by id
+PUT {{baseUrl}}/boards/7/restore
+Authorization: {{userToken}}

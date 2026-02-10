@@ -20,11 +20,12 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserResponseDto } from './dto/user-response.dto'; // Ensure this path is correct
+import { UserResponseDto } from './dto/user-response.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
+import { UserExistsPipe } from './pipes/user-exists.pipe';
 
 @ApiTags('users')
 @Controller('users')
@@ -84,7 +85,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   updateMe(
-    @CurrentUser('id') userId: number,
+    @CurrentUser('id', UserExistsPipe) userId: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.updateSelf(userId, updateUserDto);
@@ -97,7 +98,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Delete the authenticated user account' })
   @ApiOkResponse({ description: 'Account deleted successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  removeMe(@CurrentUser('id') userId: number) {
+  removeMe(@CurrentUser('id', UserExistsPipe) userId: number) {
     return this.usersService.remove(userId);
   }
 }

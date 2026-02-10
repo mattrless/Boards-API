@@ -21,6 +21,10 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     return this.extendedClient.systemRole;
   }
 
+  get boardRole() {
+    return this.extendedClient.boardRole;
+  }
+
   get profile() {
     return this.extendedClient.profile;
   }

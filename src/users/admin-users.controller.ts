@@ -21,6 +21,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
 import { Permissions } from 'src/auth/decorators/permissions.decorator';
 import { ActionResponseDto } from './dto/action-response.dto';
+import { UserExistsPipe } from './pipes/user-exists.pipe';
 
 @ApiTags('admin/users')
 @ApiBearerAuth('JWT')
@@ -43,7 +44,7 @@ export class AdminUsersController {
   })
   @ApiResponse({ status: 404, description: 'User not found.' })
   adminUpdate(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe, UserExistsPipe) id: number,
     @Body() adminUpdateUserDto: AdminUpdateUserDto,
   ) {
     return this.usersService.adminUpdate(id, adminUpdateUserDto);
@@ -62,7 +63,7 @@ export class AdminUsersController {
     description: 'Forbidden: Insufficient permissions.',
   })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id', ParseIntPipe, UserExistsPipe) id: number) {
     return this.usersService.remove(id);
   }
 
