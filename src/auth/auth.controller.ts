@@ -1,10 +1,11 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { LoginResponseDto } from './dto/response-login.dto';
 import { User } from '../../generated/prisma/client';
+import { ApiLoginDocs } from './docs/auth.docs';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -12,12 +13,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @ApiOperation({ summary: 'Login with credentials.' })
-  @ApiResponse({
-    status: 200,
-    description: 'Login succed',
-    type: LoginResponseDto,
-  })
+  @ApiLoginDocs()
   async login(@Body() loginUserDto: LoginUserDto): Promise<LoginResponseDto> {
     const user = (await this.authService.validateUser(
       loginUserDto.email,

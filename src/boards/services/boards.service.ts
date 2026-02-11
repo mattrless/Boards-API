@@ -3,14 +3,14 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateBoardDto } from './dto/create-board.dto';
-import { UpdateBoardDto } from './dto/update-board.dto';
-import { BoardResponseDto } from './dto/board-response.dto';
 import { plainToInstance } from 'class-transformer';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '../../generated/prisma/client';
-import { BoardOwnerResponseDto } from './dto/board-owner-response.dto';
 import { ActionResponseDto } from 'src/users/dto/action-response.dto';
+import { CreateBoardDto } from '../dto/create-board.dto';
+import { BoardResponseDto } from '../dto/board-response.dto';
+import { Prisma } from 'generated/prisma/client';
+import { BoardOwnerResponseDto } from '../dto/board-owner-response.dto';
+import { UpdateBoardDto } from '../dto/update-board.dto';
 
 @Injectable()
 export class BoardsService {
@@ -76,12 +76,7 @@ export class BoardsService {
   }
 
   async findOne(id: number) {
-    const board = await this.prismaService.board.findFirst({
-      where: { id },
-      include: {
-        owner: true,
-      },
-    });
+    const board = await this.getBoardById(id);
 
     return plainToInstance(BoardOwnerResponseDto, board, {
       excludeExtraneousValues: true,
@@ -120,7 +115,6 @@ export class BoardsService {
       ) {
         throw new NotFoundException('Owner not found');
       }
-      console.log(error);
       throw new InternalServerErrorException('Failed to update board');
     }
   }
@@ -162,7 +156,7 @@ export class BoardsService {
     );
   }
 
-  private async getBoardRoleId(name: string) {
+  async getBoardRoleId(name: string) {
     const boardRole = await this.prismaService.boardRole.findFirst({
       where: { name: name },
       select: { id: true },
@@ -170,10 +164,25 @@ export class BoardsService {
 
     if (!boardRole) {
       throw new InternalServerErrorException(
-        'Admin board role is not configured in database',
+        'Board role is not configured in database',
       );
     }
 
     return boardRole.id;
+  }
+
+  async getBoardById(id: number) {
+    const board = await this.prismaService.board.findUnique({
+      where: { id },
+      include: {
+        owner: true,
+      },
+    });
+
+    if (!board) {
+      throw new NotFoundException('Board not found');
+    }
+
+    return board;
   }
 }

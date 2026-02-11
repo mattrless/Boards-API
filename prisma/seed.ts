@@ -33,6 +33,11 @@ async function main() {
       { name: 'board_update', type: PermissionType.SYSTEM },
       { name: 'board_restore', type: PermissionType.SYSTEM },
 
+      { name: 'board_add_members', type: PermissionType.BOARD },
+      { name: 'board_remove_members', type: PermissionType.BOARD },
+      { name: 'board_update_member_role', type: PermissionType.BOARD },
+      { name: 'board_view_members', type: PermissionType.BOARD },
+
       // USER – admin only
       { name: 'user_update_any', type: PermissionType.SYSTEM },
       { name: 'user_delete_any', type: PermissionType.SYSTEM },
@@ -103,6 +108,57 @@ async function main() {
   await prisma.systemRoleSystemPermission.createMany({
     data: userPermissions.map((permission) => ({
       systemRoleId: userRole.id,
+      permissionId: permission.id,
+    })),
+    skipDuplicates: true,
+  });
+
+  const adminBoardRole = await prisma.boardRole.findUnique({
+    where: { name: 'admin' },
+  });
+
+  const memberBoardRole = await prisma.boardRole.findUnique({
+    where: { name: 'member' },
+  });
+
+  if (!adminBoardRole || !memberBoardRole) {
+    throw new Error('Board roles not found');
+  }
+
+  const adminBoardPermissions = await prisma.permission.findMany({
+    where: {
+      name: {
+        in: [
+          'board_add_members',
+          'board_remove_members',
+          'board_update_member_role',
+          'board_view_members',
+        ],
+      },
+      type: PermissionType.BOARD,
+    },
+  });
+
+  const memberBoardPermissions = await prisma.permission.findMany({
+    where: {
+      name: {
+        in: ['board_view_members'],
+      },
+      type: PermissionType.BOARD,
+    },
+  });
+
+  await prisma.boardRoleBoardPermission.createMany({
+    data: adminBoardPermissions.map((permission) => ({
+      boardRoleId: adminBoardRole.id,
+      permissionId: permission.id,
+    })),
+    skipDuplicates: true,
+  });
+
+  await prisma.boardRoleBoardPermission.createMany({
+    data: memberBoardPermissions.map((permission) => ({
+      boardRoleId: memberBoardRole.id,
       permissionId: permission.id,
     })),
     skipDuplicates: true,

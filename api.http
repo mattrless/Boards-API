@@ -2,22 +2,18 @@
 @userToken = Bearer TOKEN
 @adminToken = Bearer TOKEN
 
-### =========================
 ### AUTH
-### =========================
 
 ### Login (user / admin)
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@local.dev",
+  "email": "userL@local.dev",
   "password": "12345"
 }
 
-### =========================
 ### USERS (SELF)
-### =========================
 
 ### Get all users
 GET {{baseUrl}}/users
@@ -32,7 +28,7 @@ POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
-  "email": "userP@local.dev",
+  "email": "userL@local.dev",
   "password": "12345",
   "profile": {
     "name": "Carlos"
@@ -113,9 +109,27 @@ Content-Type: application/json
 }
 
 ### Soft delete board by id
-DELETE {{baseUrl}}/boards/7
+DELETE {{baseUrl}}/boards/8
 Authorization: {{userToken}}
 
 ### Restore board by id
-PUT {{baseUrl}}/boards/7/restore
+PUT {{baseUrl}}/boards/8/restore
 Authorization: {{userToken}}
+
+### Add user as member to board
+POST {{baseUrl}}/boards/9/invite
+Authorization: {{userToken}}
+Content-Type: application/json
+
+{
+  "email": "userP@local.dev"
+}
+
+### Remove member from board
+DELETE {{baseUrl}}/boards/9/remove/3
+Authorization: {{userToken}}
+Content-Type: application/json
+
+{
+  "email": "userP@local.dev"
+}
