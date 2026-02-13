@@ -40,7 +40,7 @@ export class BoardPermissionsGuard implements CanActivate {
       throw new ForbiddenException('User not authenticated');
     }
 
-    const boardId = Number(request.params.boardId);
+    const boardId = Number(request.params.id ?? request.params.boardId);
     if (!Number.isInteger(boardId)) {
       throw new BadRequestException('Invalid board id');
     }

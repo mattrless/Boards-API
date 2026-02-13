@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:3000
-@userToken = Bearer TOKEN
+@userToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImlhdCI6MTc3MDk5NTgyNSwiZXhwIjoxNzcxMTY4NjI1fQ.ES1mdYCaPdzj7NCoC7ZJJyduRMwwfpf7kHX7lIFPb6s
 @adminToken = Bearer TOKEN
 
 ### AUTH
@@ -145,4 +145,8 @@ Content-Type: application/json
 
 ### Get board members with board roles by board id
 GET {{baseUrl}}/boards/9/members
+Authorization: {{userToken}}
+
+### Transfer ownership
+PUT {{baseUrl}}/boards/9/transfer-ownership/4
 Authorization: {{userToken}}

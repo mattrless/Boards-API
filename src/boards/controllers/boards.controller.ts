@@ -25,8 +25,10 @@ import {
   ApiFindOneBoardDocs,
   ApiRemoveBoardDocs,
   ApiRestoreBoardDocs,
+  ApiTransferOwnershipDocs,
   ApiUpdateBoardDocs,
 } from '../docs/boards.docs';
+import { BoardPermissionsGuard } from 'src/auth/guards/board-permissions.guard';
 
 @Controller('boards')
 export class BoardsController {
@@ -84,5 +86,16 @@ export class BoardsController {
   @Put(':id/restore')
   restore(@Param('id', ParseIntPipe) id: number) {
     return this.boardsService.restore(id);
+  }
+
+  @ApiTransferOwnershipDocs()
+  @UseGuards(AuthGuard('jwt'), BoardPermissionsGuard, EnsureBoardOwnershipGuard)
+  @Permissions('board_update_member_role')
+  @Put(':boardId/transfer-ownership/:targetUserId')
+  transferOwnership(
+    @Param('boardId', ParseIntPipe) boardId: number,
+    @Param('targetUserId', ParseIntPipe) targetUserId: number,
+  ) {
+    return this.boardsService.transferOwnership(boardId, targetUserId);
   }
 }

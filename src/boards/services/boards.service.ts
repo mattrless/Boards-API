@@ -1,4 +1,6 @@
 import {
+  ConflictException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -154,6 +156,100 @@ export class BoardsService {
         excludeExtraneousValues: true,
       },
     );
+  }
+
+  async transferOwnership(boardId: number, targetUserId: number) {
+    try {
+      const board = await this.getBoardById(boardId);
+
+      if (board.ownerId === targetUserId) {
+        throw new ConflictException('Target user is already the owner');
+      }
+
+      await this.prismaService.client.$transaction(async (tx) => {
+        const boardAdminRole = await tx.boardRole.findFirst({
+          where: { name: 'admin' },
+          select: { id: true },
+        });
+
+        if (!boardAdminRole) {
+          throw new InternalServerErrorException(
+            'Board role is not configured in database',
+          );
+        }
+
+        const targetUserBoardRole = await tx.userBoard.findUnique({
+          where: {
+            boardId_userId: {
+              boardId,
+              userId: targetUserId,
+            },
+          },
+          select: {
+            boardRole: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        });
+
+        if (!targetUserBoardRole) {
+          throw new NotFoundException(
+            'Target user not found or is not in board.',
+          );
+        }
+
+        const targetUserBoardRoleName = targetUserBoardRole.boardRole.name;
+
+        if (targetUserBoardRoleName === 'member') {
+          await tx.userBoard.update({
+            where: {
+              boardId_userId: {
+                boardId,
+                userId: targetUserId,
+              },
+            },
+            data: {
+              boardRoleId: boardAdminRole.id,
+            },
+          });
+        } else if (targetUserBoardRoleName !== 'admin') {
+          throw new ConflictException(
+            `Cannot transfer ownership to board role "${targetUserBoardRoleName}".`,
+          );
+        }
+
+        await tx.board.update({
+          where: {
+            id: boardId,
+          },
+          data: {
+            owner: {
+              connect: {
+                id: targetUserId,
+              },
+            },
+          },
+        });
+      });
+
+      return plainToInstance(
+        ActionResponseDto,
+        { message: 'Board ownership transferred' },
+        {
+          excludeExtraneousValues: true,
+        },
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        'Failed to transfer board ownership.',
+      );
+    }
   }
 
   async getBoardRoleId(name: string) {

@@ -3,10 +3,12 @@ import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiResponse,
 } from '@nestjs/swagger';
 import { BoardOwnerResponseDto } from '../dto/board-owner-response.dto';
 import { BoardResponseDto } from '../dto/board-response.dto';
+import { ActionResponseDto } from 'src/users/dto/action-response.dto';
 
 export function ApiCreateBoardDocs() {
   return applyDecorators(
@@ -96,6 +98,42 @@ export function ApiRestoreBoardDocs() {
       description: 'Forbidden: Insufficient permissions.',
     }),
     ApiResponse({ status: 404, description: 'Board not found.' }),
+    ApiBearerAuth('JWT'),
+  );
+}
+
+export function ApiTransferOwnershipDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Transfer board ownership to another member.' }),
+    ApiParam({
+      name: 'boardId',
+      type: Number,
+      description: 'Target board id.',
+    }),
+    ApiParam({
+      name: 'targetUserId',
+      type: Number,
+      description: 'User id that will become the new owner.',
+    }),
+    ApiOkResponse({
+      description: 'Board ownership transferred successfully.',
+      type: ActionResponseDto,
+    }),
+    ApiResponse({ status: 400, description: 'Invalid input data.' }),
+    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({
+      status: 403,
+      description: 'Forbidden: only the current owner can transfer ownership.',
+    }),
+    ApiResponse({
+      status: 404,
+      description: 'Board or target member not found.',
+    }),
+    ApiResponse({
+      status: 409,
+      description:
+        'Conflict: target is already owner or has an unsupported board role.',
+    }),
     ApiBearerAuth('JWT'),
   );
 }

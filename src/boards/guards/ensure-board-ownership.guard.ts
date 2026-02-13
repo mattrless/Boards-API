@@ -23,7 +23,7 @@ export class EnsureBoardOwnershipGuard implements CanActivate {
       throw new UnauthorizedException('User not authenticated');
     }
 
-    const boardId = Number(request.params.id);
+    const boardId = Number(request.params.id ?? request.params.boardId);
     if (!Number.isInteger(boardId)) {
       throw new BadRequestException('Invalid board id');
     }
