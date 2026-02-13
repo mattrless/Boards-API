@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Permissions } from 'src/auth/decorators/permissions.decorator';
@@ -16,7 +17,9 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import {
   ApiAddMemberDocs,
   ApiRemoveMemberDocs,
+  ApiUpdateMemberRoleDocs,
 } from '../docs/board-members.docs';
+import { UpdateBoardMemberRoleDto } from '../dto/update-board-member-role.dto';
 
 @Controller('boards')
 export class BoardMembersController {
@@ -47,6 +50,24 @@ export class BoardMembersController {
       currentUserId,
       boardId,
       targetUserId,
+    );
+  }
+
+  @ApiUpdateMemberRoleDocs()
+  @UseGuards(AuthGuard('jwt'), BoardPermissionsGuard)
+  @Permissions('board_update_member_role')
+  @Put(':boardId/members/:targetUserId/role')
+  updateBoardMemberRole(
+    @CurrentUser('id') currentUserId: number,
+    @Param('boardId', ParseIntPipe) boardId: number,
+    @Param('targetUserId', ParseIntPipe) targetUserId: number,
+    @Body() updateBoardMemberRoleDto: UpdateBoardMemberRoleDto,
+  ) {
+    return this.boardMembersService.updateBoardMemberRole(
+      currentUserId,
+      boardId,
+      targetUserId,
+      updateBoardMemberRoleDto,
     );
   }
 }

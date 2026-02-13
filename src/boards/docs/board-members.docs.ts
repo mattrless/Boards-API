@@ -68,3 +68,37 @@ export function ApiRemoveMemberDocs() {
     ApiBearerAuth('JWT'),
   );
 }
+
+export function ApiUpdateMemberRoleDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Update board member role.' }),
+    ApiParam({
+      name: 'boardId',
+      type: Number,
+      description: 'Target board id.',
+    }),
+    ApiParam({
+      name: 'targetUserId',
+      type: Number,
+      description: 'User id whose role will be updated.',
+    }),
+    ApiOkResponse({
+      description: 'Member role updated successfully.',
+      type: ActionResponseDto,
+    }),
+    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({ status: 400, description: 'Invalid input data.' }),
+    ApiResponse({ status: 404, description: 'Board or member not found.' }),
+    ApiResponse({
+      status: 409,
+      description:
+        'Business rule conflict: owner role change, no-op role update, or admin policy violation.',
+    }),
+    ApiResponse({
+      status: 403,
+      description:
+        'Forbidden: current user is not a board member or lacks permission.',
+    }),
+    ApiBearerAuth('JWT'),
+  );
+}

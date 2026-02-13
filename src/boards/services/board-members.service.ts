@@ -13,6 +13,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { ActionResponseDto } from 'src/users/dto/action-response.dto';
 import { AddMemberDto } from '../dto/add-member.dto';
 import { UsersService } from 'src/users/users.service';
+import { UpdateBoardMemberRoleDto } from '../dto/update-board-member-role.dto';
 
 @Injectable()
 export class BoardMembersService {
@@ -163,6 +164,121 @@ export class BoardMembersService {
       }
 
       throw new InternalServerErrorException('Failed to remove member.');
+    }
+  }
+
+  async updateBoardMemberRole(
+    currentUserId: number,
+    boardId: number,
+    targetUserId: number,
+    updateBoardMemberRoleDto: UpdateBoardMemberRoleDto,
+  ): Promise<ActionResponseDto> {
+    try {
+      const board = await this.boardsService.getBoardById(boardId);
+      const targetRoleId = await this.boardsService.getBoardRoleId(
+        updateBoardMemberRoleDto.role,
+      );
+      const memberships = await this.prismaService.userBoard.findMany({
+        where: {
+          boardId,
+          userId: {
+            in: [currentUserId, targetUserId],
+          },
+        },
+        include: {
+          boardRole: {
+            select: { name: true },
+          },
+        },
+      });
+
+      const currentMembership = memberships.find(
+        (membership) => membership.userId === currentUserId,
+      );
+      const targetMembership = memberships.find(
+        (membership) => membership.userId === targetUserId,
+      );
+
+      if (!currentMembership) {
+        throw new ForbiddenException('Current user is not a board member.');
+      }
+
+      if (!targetMembership) {
+        throw new NotFoundException('Member not found in this board.');
+      }
+
+      const currentUserIsOwner = board.ownerId === currentUserId;
+      const targetUserIsOwner = board.ownerId === targetUserId;
+      const currentRole = currentMembership.boardRole.name;
+      const targetRole = targetMembership.boardRole.name;
+      const desiredRole = updateBoardMemberRoleDto.role;
+
+      if (currentUserIsOwner && targetUserIsOwner) {
+        throw new ConflictException(
+          'Owner cannot update his own role through this endpoint.',
+        );
+      }
+
+      if (targetUserIsOwner) {
+        throw new ConflictException('Board owner role cannot be changed.');
+      }
+
+      if (targetRole === desiredRole) {
+        throw new ConflictException('Member already has the requested role.');
+      }
+
+      if (!currentUserIsOwner) {
+        if (currentRole !== 'admin') {
+          throw new ForbiddenException(
+            'Only owner or admin can update board member roles.',
+          );
+        }
+
+        if (targetRole === 'admin') {
+          throw new ConflictException(
+            'Admin cannot change another admin role.',
+          );
+        }
+
+        if (targetRole !== 'member' || desiredRole !== 'admin') {
+          throw new ConflictException(
+            'Admin can only promote members to admin.',
+          );
+        }
+      }
+
+      await this.prismaService.userBoard.update({
+        where: {
+          boardId_userId: {
+            boardId,
+            userId: targetUserId,
+          },
+        },
+        data: {
+          boardRoleId: targetRoleId,
+        },
+      });
+
+      return plainToInstance(
+        ActionResponseDto,
+        { message: 'Member role updated successfully' },
+        {
+          excludeExtraneousValues: true,
+        },
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('Member not found in this board.');
+      }
+
+      throw new InternalServerErrorException('Failed to update member role.');
     }
   }
 }

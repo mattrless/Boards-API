@@ -122,7 +122,7 @@ Authorization: {{userToken}}
 Content-Type: application/json
 
 {
-  "email": "userP@local.dev"
+  "email": "john.doe@example.com"
 }
 
 ### Remove member from board
@@ -132,4 +132,13 @@ Content-Type: application/json
 
 {
   "email": "userP@local.dev"
+}
+
+### Update board member role
+PUT {{baseUrl}}/boards/9/members/4/role
+Authorization: {{userToken}}
+Content-Type: application/json
+
+{
+  "role": "admin"
 }
