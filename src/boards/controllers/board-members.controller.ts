@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Delete,
   Put,
+  Get,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Permissions } from 'src/auth/decorators/permissions.decorator';
@@ -16,11 +17,14 @@ import { AddMemberDto } from '../dto/add-member.dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import {
   ApiAddMemberDocs,
+  ApiFindBoardMembersDocs,
   ApiRemoveMemberDocs,
   ApiUpdateMemberRoleDocs,
 } from '../docs/board-members.docs';
 import { UpdateBoardMemberRoleDto } from '../dto/update-board-member-role.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Board members')
 @Controller('boards')
 export class BoardMembersController {
   constructor(private readonly boardMembersService: BoardMembersService) {}
@@ -69,5 +73,13 @@ export class BoardMembersController {
       targetUserId,
       updateBoardMemberRoleDto,
     );
+  }
+
+  @ApiFindBoardMembersDocs()
+  @UseGuards(AuthGuard('jwt'), BoardPermissionsGuard)
+  @Permissions('board_view_members')
+  @Get(':boardId/members')
+  findBoardMembers(@Param('boardId', ParseIntPipe) boardId: number) {
+    return this.boardMembersService.findBoardMembers(boardId);
   }
 }

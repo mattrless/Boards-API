@@ -142,3 +142,7 @@ Content-Type: application/json
 {
   "role": "admin"
 }
+
+### Get board members with board roles by board id
+GET {{baseUrl}}/boards/9/members
+Authorization: {{userToken}}

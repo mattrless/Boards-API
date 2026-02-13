@@ -7,6 +7,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { ActionResponseDto } from 'src/users/dto/action-response.dto';
+import { BoardMemberResponseDto } from '../dto/board-members-response.dto';
 
 export function ApiAddMemberDocs() {
   return applyDecorators(
@@ -94,6 +95,30 @@ export function ApiUpdateMemberRoleDocs() {
       description:
         'Business rule conflict: owner role change, no-op role update, or admin policy violation.',
     }),
+    ApiResponse({
+      status: 403,
+      description:
+        'Forbidden: current user is not a board member or lacks permission.',
+    }),
+    ApiBearerAuth('JWT'),
+  );
+}
+
+export function ApiFindBoardMembersDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Get board members with their board role.' }),
+    ApiParam({
+      name: 'boardId',
+      type: Number,
+      description: 'Target board id.',
+    }),
+    ApiOkResponse({
+      description: 'Board members returned successfully.',
+      type: [BoardMemberResponseDto],
+    }),
+    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({ status: 400, description: 'Invalid input data.' }),
+    ApiResponse({ status: 404, description: 'Board not found.' }),
     ApiResponse({
       status: 403,
       description:

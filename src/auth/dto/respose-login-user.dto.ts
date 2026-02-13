@@ -1,19 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
+import { UserIdentityResponseDto } from 'src/users/dto/user-summary-response.dto';
 
-export class LoginUserResponseDto {
-  @ApiProperty({
-    example: 1,
-  })
-  @Expose()
-  id: number;
-
-  @ApiProperty({
-    example: 'admin@local.dev',
-  })
-  @Expose()
-  email: string;
-
+export class LoginUserResponseDto extends UserIdentityResponseDto {
   @ApiProperty({
     example: '2026-02-06T00:20:49.552Z',
   })

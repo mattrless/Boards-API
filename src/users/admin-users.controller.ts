@@ -20,7 +20,7 @@ import {
   ApiAdminUpdateUserDocs,
 } from './docs/admin-users.docs';
 
-@ApiTags('admin/users')
+@ApiTags('Administrator')
 @Controller('admin/users')
 export class AdminUsersController {
   constructor(private readonly usersService: UsersService) {}

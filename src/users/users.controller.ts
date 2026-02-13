@@ -26,7 +26,7 @@ import {
   ApiUpdateMeDocs,
 } from './docs/users.docs';
 
-@ApiTags('users')
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

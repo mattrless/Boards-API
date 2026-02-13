@@ -14,6 +14,7 @@ import { ActionResponseDto } from 'src/users/dto/action-response.dto';
 import { AddMemberDto } from '../dto/add-member.dto';
 import { UsersService } from 'src/users/users.service';
 import { UpdateBoardMemberRoleDto } from '../dto/update-board-member-role.dto';
+import { BoardMemberResponseDto } from '../dto/board-members-response.dto';
 
 @Injectable()
 export class BoardMembersService {
@@ -279,6 +280,56 @@ export class BoardMembersService {
       }
 
       throw new InternalServerErrorException('Failed to update member role.');
+    }
+  }
+
+  async findBoardMembers(boardId: number) {
+    try {
+      const members = await this.prismaService.userBoard.findMany({
+        where: {
+          boardId: boardId,
+        },
+        select: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              profile: {
+                select: {
+                  name: true,
+                  avatar: true,
+                },
+              },
+            },
+          },
+          boardRole: {
+            select: {
+              name: true,
+            },
+          },
+          board: {
+            select: {
+              ownerId: true,
+            },
+          },
+        },
+      });
+
+      const membersWithOwner = members.map((member) => ({
+        user: member.user,
+        boardRole: member.boardRole,
+        isOwner: member.user.id === member.board.ownerId,
+      }));
+
+      return plainToInstance(BoardMemberResponseDto, membersWithOwner, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Failed to fetch board members.');
     }
   }
 }
