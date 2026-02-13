@@ -7,7 +7,7 @@ export class BoardExistsPipe implements PipeTransform<number, Promise<number>> {
 
   async transform(id: number): Promise<number> {
     const board = await this.prismaService.board.findFirst({
-      where: { id: id },
+      where: { id: id, deletedAt: null },
       select: { id: true },
     });
 

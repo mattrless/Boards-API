@@ -62,6 +62,7 @@ export class UsersService {
   async findAll() {
     try {
       const users = await this.prismaService.user.findMany({
+        where: { deletedAt: null },
         include: { profile: true, systemRole: true },
       });
 
@@ -75,7 +76,7 @@ export class UsersService {
 
   async findOne(id: number) {
     const user = await this.prismaService.user.findFirst({
-      where: { id },
+      where: { id, deletedAt: null },
       include: {
         profile: true,
         systemRole: true,
@@ -210,7 +211,7 @@ export class UsersService {
 
   async getUserByEmail(email: string) {
     const user = await this.prismaService.user.findFirst({
-      where: { email },
+      where: { email, deletedAt: null },
       select: {
         id: true,
         email: true,

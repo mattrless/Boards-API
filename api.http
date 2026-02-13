@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:3000
 @userToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImlhdCI6MTc3MDk5NTgyNSwiZXhwIjoxNzcxMTY4NjI1fQ.ES1mdYCaPdzj7NCoC7ZJJyduRMwwfpf7kHX7lIFPb6s
-@adminToken = Bearer TOKEN
+@adminToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc3MTAwNjg4MCwiZXhwIjoxNzcxMTc5NjgwfQ.pdWp7-5m1dh8m5uPynjNgZugBOhjvJkFGwl0iWw5_GE
 
 ### AUTH
 
@@ -9,7 +9,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "userL@local.dev",
+  "email": "admin@local.dev",
   "password": "12345"
 }
 

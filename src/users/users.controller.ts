@@ -49,7 +49,7 @@ export class UsersController {
   @Permissions('user_read')
   @Get(':id')
   @ApiFindOneUserDocs()
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', ParseIntPipe, UserExistsPipe) id: number) {
     return this.usersService.findOne(id);
   }
 

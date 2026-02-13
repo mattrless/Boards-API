@@ -81,6 +81,9 @@ export class BoardMembersService {
           userId: {
             in: [currentUserId, targetUserId],
           },
+          user: {
+            deletedAt: null,
+          },
         },
         include: {
           boardRole: {
@@ -185,6 +188,9 @@ export class BoardMembersService {
           userId: {
             in: [currentUserId, targetUserId],
           },
+          user: {
+            deletedAt: null,
+          },
         },
         include: {
           boardRole: {
@@ -288,6 +294,9 @@ export class BoardMembersService {
       const members = await this.prismaService.userBoard.findMany({
         where: {
           boardId: boardId,
+          user: {
+            deletedAt: null,
+          },
         },
         select: {
           user: {

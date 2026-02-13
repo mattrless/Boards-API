@@ -45,8 +45,8 @@ export class BoardPermissionsGuard implements CanActivate {
       throw new BadRequestException('Invalid board id');
     }
 
-    const board = await this.prismaService.board.findUnique({
-      where: { id: boardId },
+    const board = await this.prismaService.board.findFirst({
+      where: { id: boardId, deletedAt: null },
       select: { id: true },
     });
 
@@ -54,11 +54,18 @@ export class BoardPermissionsGuard implements CanActivate {
       throw new NotFoundException('Board not found');
     }
 
-    const membership = await this.prismaService.userBoard.findUnique({
+    const isSystemAdmin =
+      user.systemRole?.name?.toLowerCase().trim() === 'admin';
+    if (isSystemAdmin) {
+      return true;
+    }
+
+    const membership = await this.prismaService.userBoard.findFirst({
       where: {
-        boardId_userId: {
-          boardId,
-          userId: user.id,
+        boardId,
+        userId: user.id,
+        user: {
+          deletedAt: null,
         },
       },
       include: {

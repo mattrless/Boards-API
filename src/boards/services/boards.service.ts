@@ -22,7 +22,7 @@ export class BoardsService {
     try {
       const adminBoardRoleId = await this.getBoardRoleId('admin');
 
-      const board = await this.prismaService.client.$transaction(async (tx) => {
+      const board = await this.prismaService.$transaction(async (tx) => {
         const createdBoard = await tx.board.create({
           data: {
             name: createBoardDto.name,
@@ -55,6 +55,10 @@ export class BoardsService {
         excludeExtraneousValues: true,
       });
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2003'
@@ -67,7 +71,11 @@ export class BoardsService {
 
   async findAll() {
     try {
-      const boards = await this.prismaService.board.findMany();
+      const boards = await this.prismaService.board.findMany({
+        where: {
+          deletedAt: null,
+        },
+      });
 
       return plainToInstance(BoardResponseDto, boards, {
         excludeExtraneousValues: true,
@@ -87,16 +95,10 @@ export class BoardsService {
 
   async update(id: number, updateBoardDto: UpdateBoardDto) {
     try {
+      await this.getBoardById(id);
+
       const data: Prisma.BoardUpdateInput = {
         name: updateBoardDto.name,
-        owner:
-          updateBoardDto.ownerId !== undefined
-            ? {
-                connect: {
-                  id: updateBoardDto.ownerId,
-                },
-              }
-            : undefined,
       };
 
       const board = await this.prismaService.board.update({
@@ -111,21 +113,29 @@ export class BoardsService {
         excludeExtraneousValues: true,
       });
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2025'
       ) {
-        throw new NotFoundException('Owner not found');
+        throw new NotFoundException('Board not found');
       }
       throw new InternalServerErrorException('Failed to update board');
     }
   }
 
   async remove(id: number) {
-    await this.prismaService.board.update({
-      where: { id },
+    const result = await this.prismaService.board.updateMany({
+      where: { id, deletedAt: null },
       data: { deletedAt: new Date() },
     });
+
+    if (result.count === 0) {
+      throw new NotFoundException('Board not found');
+    }
 
     return plainToInstance(
       ActionResponseDto,
@@ -166,7 +176,7 @@ export class BoardsService {
         throw new ConflictException('Target user is already the owner');
       }
 
-      await this.prismaService.client.$transaction(async (tx) => {
+      await this.prismaService.$transaction(async (tx) => {
         const boardAdminRole = await tx.boardRole.findFirst({
           where: { name: 'admin' },
           select: { id: true },
@@ -178,11 +188,12 @@ export class BoardsService {
           );
         }
 
-        const targetUserBoardRole = await tx.userBoard.findUnique({
+        const targetUserBoardRole = await tx.userBoard.findFirst({
           where: {
-            boardId_userId: {
-              boardId,
-              userId: targetUserId,
+            boardId,
+            userId: targetUserId,
+            user: {
+              deletedAt: null,
             },
           },
           select: {
@@ -268,8 +279,11 @@ export class BoardsService {
   }
 
   async getBoardById(id: number) {
-    const board = await this.prismaService.board.findUnique({
-      where: { id },
+    const board = await this.prismaService.board.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
       include: {
         owner: true,
       },

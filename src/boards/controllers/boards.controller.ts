@@ -54,7 +54,7 @@ export class BoardsController {
   }
 
   @ApiFindOneBoardDocs()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Permissions('board_read')
   @Get(':id')
   findOne(@Param('id', ParseIntPipe, BoardExistsPipe) id: number) {

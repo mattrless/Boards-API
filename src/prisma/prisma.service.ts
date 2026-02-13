@@ -1,47 +1,19 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { createPrismaClient, ExtendedPrismaClient } from './prisma.client';
+import { Injectable } from '@nestjs/common';
+import { PrismaClient } from '../../generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 @Injectable()
-export class PrismaService implements OnModuleInit, OnModuleDestroy {
-  private readonly extendedClient: ExtendedPrismaClient;
-
+export class PrismaService extends PrismaClient {
   constructor() {
-    this.extendedClient = createPrismaClient();
-  }
-
-  get user() {
-    return this.extendedClient.user;
-  }
-
-  get board() {
-    return this.extendedClient.board;
-  }
-
-  get systemRole() {
-    return this.extendedClient.systemRole;
-  }
-
-  get boardRole() {
-    return this.extendedClient.boardRole;
-  }
-
-  get profile() {
-    return this.extendedClient.profile;
-  }
-
-  get userBoard() {
-    return this.extendedClient.userBoard;
-  }
-
-  get client() {
-    return this.extendedClient;
-  }
-
-  async onModuleInit() {
-    await this.extendedClient.$connect();
-  }
-
-  async onModuleDestroy() {
-    await this.extendedClient.$disconnect();
+    super({
+      adapter: new PrismaPg({
+        connectionString: process.env.DATABASE_URL,
+      }),
+      omit: {
+        user: {
+          password: true,
+        },
+      } as const,
+    });
   }
 }

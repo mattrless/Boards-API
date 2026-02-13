@@ -7,7 +7,7 @@ export class UserExistsPipe implements PipeTransform<number, Promise<number>> {
 
   async transform(id: number): Promise<number> {
     const user = await this.prismaService.user.findFirst({
-      where: { id: id },
+      where: { id: id, deletedAt: null },
       select: { id: true },
     });
 
