@@ -56,36 +56,36 @@ export class BoardsController {
   @ApiFindOneBoardDocs()
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Permissions('board_read')
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe, BoardExistsPipe) id: number) {
-    return this.boardsService.findOne(id);
+  @Get(':boardId')
+  findOne(@Param('boardId', ParseIntPipe, BoardExistsPipe) boardId: number) {
+    return this.boardsService.findOne(boardId);
   }
 
   @ApiUpdateBoardDocs()
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Permissions('board_update')
-  @Put(':id')
+  @Put(':boardId')
   update(
-    @Param('id', ParseIntPipe, BoardExistsPipe) id: number,
+    @Param('boardId', ParseIntPipe, BoardExistsPipe) boardId: number,
     @Body() updateBoardDto: UpdateBoardDto,
   ) {
-    return this.boardsService.update(id, updateBoardDto);
+    return this.boardsService.update(boardId, updateBoardDto);
   }
 
   @ApiRemoveBoardDocs()
   @UseGuards(AuthGuard('jwt'), PermissionsGuard, EnsureBoardOwnershipGuard)
   @Permissions('board_delete')
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.boardsService.remove(id);
+  @Delete(':boardId')
+  remove(@Param('boardId', ParseIntPipe) boardId: number) {
+    return this.boardsService.remove(boardId);
   }
 
   @ApiRestoreBoardDocs()
   @UseGuards(AuthGuard('jwt'), PermissionsGuard)
   @Permissions('board_restore')
-  @Put(':id/restore')
-  restore(@Param('id', ParseIntPipe) id: number) {
-    return this.boardsService.restore(id);
+  @Put(':boardId/restore')
+  restore(@Param('boardId', ParseIntPipe) boardId: number) {
+    return this.boardsService.restore(boardId);
   }
 
   @ApiTransferOwnershipDocs()

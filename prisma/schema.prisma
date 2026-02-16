@@ -146,7 +146,7 @@ model BoardRoleBoardPermission {
 model List {
   id         Int      @id @default(autoincrement())
   title      String
-  position   Int
+  position   Float
 
   boardId    Int      @map("board_id")
   board      Board    @relation(fields: [boardId], references: [id])
@@ -156,6 +156,7 @@ model List {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @default(now()) @updatedAt @map("updated_at")
 
+  @@unique([boardId, position])
   @@map("lists")
 }
 
@@ -163,7 +164,7 @@ model Card {
   id          Int      @id @default(autoincrement())
   title       String
   description String?
-  position    Int
+  position    Float
 
   listId      Int      @map("list_id")
   list        List     @relation(fields: [listId], references: [id])
