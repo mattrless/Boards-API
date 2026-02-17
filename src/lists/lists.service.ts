@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   Injectable,
   InternalServerErrorException,
@@ -10,8 +11,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { plainToInstance } from 'class-transformer';
 import { ListResponseDto } from './dto/list-response.dto';
 import { ListSummaryResponseDto } from './dto/list-summary-response.dto';
-import { Prisma } from 'generated/prisma/client';
+import { List, Prisma } from 'generated/prisma/client';
 import { ActionResponseDto } from 'src/users/dto/action-response.dto';
+import { UpdateListPositionDto } from './dto/update-list-position.dto';
 
 @Injectable()
 export class ListsService {
@@ -60,7 +62,7 @@ export class ListsService {
       if (error instanceof HttpException) {
         throw error;
       }
-      console.log(error);
+
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2003'
@@ -197,6 +199,123 @@ export class ListsService {
       }
 
       throw new InternalServerErrorException('Failed to delete list');
+    }
+  }
+
+  async updatePosition(
+    boardId: number,
+    listId: number,
+    updateListPositionDto: UpdateListPositionDto,
+  ) {
+    const { prevListId, nextListId } = updateListPositionDto;
+
+    if (prevListId === undefined && nextListId === undefined) {
+      throw new BadRequestException(
+        'prevListId or nextListId is required to move a list',
+      );
+    }
+
+    if (prevListId === listId || nextListId === listId) {
+      throw new BadRequestException(
+        'Cannot position a list relative to itself',
+      );
+    }
+
+    if (
+      prevListId !== undefined &&
+      nextListId !== undefined &&
+      prevListId === nextListId
+    ) {
+      throw new BadRequestException(
+        'prevListId and nextListId must be different',
+      );
+    }
+
+    try {
+      const list = await this.prismaService.$transaction(async (tx) => {
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(${boardId})`;
+
+        let prevList: List | null = null;
+        let nextList: List | null = null;
+
+        if (prevListId !== undefined) {
+          prevList = await tx.list.findFirst({
+            where: {
+              id: prevListId,
+              boardId: boardId,
+            },
+          });
+          if (!prevList) {
+            throw new NotFoundException('prev list not found in this board');
+          }
+        }
+
+        if (nextListId !== undefined) {
+          nextList = await tx.list.findFirst({
+            where: {
+              id: nextListId,
+              boardId: boardId,
+            },
+          });
+          if (!nextList) {
+            throw new NotFoundException('next list not found in this board');
+          }
+        }
+
+        let newPosition: number;
+
+        if (prevList && nextList) {
+          if (prevList.position < nextList.position) {
+            newPosition = (prevList.position + nextList.position) / 2;
+          } else {
+            throw new BadRequestException(
+              'Invalid target order: prevList must be before nextList',
+            );
+          }
+        } else if (prevList) {
+          newPosition = prevList.position + 1000;
+        } else if (nextList) {
+          newPosition = nextList.position - 1000;
+        } else {
+          throw new BadRequestException(
+            'prevListId or nextListId is required to move a list',
+          );
+        }
+
+        return tx.list.update({
+          where: { id: listId },
+          data: { position: newPosition },
+          include: {
+            board: {
+              select: {
+                id: true,
+                name: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            },
+          },
+        });
+      });
+
+      return plainToInstance(ListResponseDto, list, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new BadRequestException(
+          'Position conflict. Please retry the move operation.',
+        );
+      }
+
+      throw new InternalServerErrorException('Failed to update list position');
     }
   }
 }

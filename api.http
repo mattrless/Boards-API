@@ -167,7 +167,7 @@ GET {{baseUrl}}/boards/1/lists
 Authorization: {{userToken}}
 
 ### Get list by Id
-GET {{baseUrl}}/boards/1/lists/8
+GET {{baseUrl}}/boards/1/lists/9
 Authorization: {{userToken}}
 
 ### Update list
@@ -178,6 +178,16 @@ Content-Type: application/json
 {
   "title": "list de pruebad"
 }
+
+### Update list position
+PUT {{baseUrl}}/boards/1/lists/9/position
+Authorization: {{userToken}}
+Content-Type: application/json
+
+{  
+  "nextListId": 4
+}
+
 
 ### Remove list by Id
 DELETE {{baseUrl}}/boards/1/lists/8

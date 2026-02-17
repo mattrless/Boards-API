@@ -13,6 +13,7 @@ import { ListsService } from './lists.service';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { CreateListDto } from './dto/create-list.dto';
 import { UpdateListDto } from './dto/update-list.dto';
+import { UpdateListPositionDto } from './dto/update-list-position.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { BoardPermissionsGuard } from 'src/auth/guards/board-permissions.guard';
 import { ApiTags } from '@nestjs/swagger';
@@ -22,6 +23,7 @@ import {
   ApiFindOneListDocs,
   ApiRemoveListDocs,
   ApiUpdateListDocs,
+  ApiUpdateListPositionDocs,
 } from './docs/lists.docs';
 import { ListBelongsToBoardGuard } from './guards/list-belongs-to-board.guard';
 
@@ -66,6 +68,22 @@ export class ListsController {
     @Body() updateListDto: UpdateListDto,
   ) {
     return this.listsService.update(listId, updateListDto);
+  }
+
+  @ApiUpdateListPositionDocs()
+  @UseGuards(AuthGuard('jwt'), BoardPermissionsGuard, ListBelongsToBoardGuard)
+  @Permissions('list_update')
+  @Put(':listId/position')
+  updatePosition(
+    @Param('boardId', ParseIntPipe) boardId: number,
+    @Param('listId', ParseIntPipe) listId: number,
+    @Body() updateListPositionDto: UpdateListPositionDto,
+  ) {
+    return this.listsService.updatePosition(
+      boardId,
+      listId,
+      updateListPositionDto,
+    );
   }
 
   @ApiRemoveListDocs()

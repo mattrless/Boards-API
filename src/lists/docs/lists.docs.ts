@@ -114,6 +114,35 @@ export function ApiUpdateListDocs() {
   );
 }
 
+export function ApiUpdateListPositionDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Move a list to a new position' }),
+    ApiParam({
+      name: 'boardId',
+      type: Number,
+      description: 'Target board id.',
+    }),
+    ApiParam({
+      name: 'listId',
+      type: Number,
+      description: 'Target list id.',
+    }),
+    ApiOkResponse({
+      description: 'List position updated successfully.',
+      type: ListResponseDto,
+    }),
+    ApiResponse({ status: 400, description: 'Invalid input data.' }),
+    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({
+      status: 403,
+      description:
+        'Forbidden: current user is not a board member or lacks permission.',
+    }),
+    ApiResponse({ status: 404, description: 'Board or list not found.' }),
+    ApiBearerAuth('JWT'),
+  );
+}
+
 export function ApiRemoveListDocs() {
   return applyDecorators(
     ApiOperation({ summary: 'Delete a list' }),
