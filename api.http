@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:3000
 @userToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc3MTI3MDM4NCwiZXhwIjoxNzcxNDQzMTg0fQ.N8XBbWTpDxp1whjGQRgfldl5LHj3-MsTjS0hx_CvSns
-@adminToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc3MTAwNjg4MCwiZXhwIjoxNzcxMTc5NjgwfQ.pdWp7-5m1dh8m5uPynjNgZugBOhjvJkFGwl0iWw5_GE
+@adminToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc3MTQzMzM1NCwiZXhwIjoxNzcxNjA2MTU0fQ.cZQ7yqSUa1eRYQwS85fbpjwmHsyGLhcXv1vtaiR85lw
 @user2Token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImlhdCI6MTc3MTI3NzA2OSwiZXhwIjoxNzcxNDQ5ODY5fQ.bh2xHF30tNmHLE2EEYf8jvEeWhIQWZ8J_91rKpue4LY
 
 ### AUTH
@@ -10,7 +10,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "userO@local.dev",
+  "email": "admin@local.dev",
   "password": "12345"
 }
 
@@ -201,3 +201,25 @@ Content-Type: application/json
   "title": "my cards title",
   "description": "my descr"
 }
+
+### Update card
+PUT {{baseUrl}}/boards/1/lists/6/cards/3
+Authorization: {{userToken}}
+Content-Type: application/json
+
+{
+  "title": "my cards title UP",
+  "description": "my descrUP"
+}
+
+### Get cards by list Id
+GET {{baseUrl}}/boards/1/lists/6/cards
+Authorization: {{userToken}}
+
+### Get card by Id
+GET {{baseUrl}}/boards/1/lists/6/cards/3
+Authorization: {{userToken}}
+
+### Remove card by Id
+DELETE {{baseUrl}}/boards/1/lists/6/cards/3
+Authorization: {{userToken}}

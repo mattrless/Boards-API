@@ -3,11 +3,11 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
   ParseIntPipe,
+  Put,
 } from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { CreateCardDto } from './dto/create-card.dto';
@@ -17,7 +17,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { ListBelongsToBoardGuard } from 'src/lists/guards/list-belongs-to-board.guard';
 import { BoardPermissionsGuard } from 'src/auth/guards/board-permissions.guard';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiCreateCardDocs } from './docs/cards.docs';
+import {
+  ApiCreateCardDocs,
+  ApiFindAllCardsDocs,
+  ApiFindOneCardDocs,
+  ApiRemoveCardDocs,
+  ApiUpdateCardDocs,
+} from './docs/cards.docs';
+import { CardBelongsToListGuard } from './guards/card-belongs-to-list.guard';
 
 @ApiTags('Cards')
 @Controller('boards/:boardId/lists/:listId/cards')
@@ -36,23 +43,60 @@ export class CardsController {
     return this.cardsService.create(boardId, listId, createCardDto);
   }
 
+  @ApiFindAllCardsDocs()
+  @UseGuards(AuthGuard('jwt'), BoardPermissionsGuard, ListBelongsToBoardGuard)
+  @Permissions('card_read')
   @Get()
-  findAll() {
-    return this.cardsService.findAll();
+  findAll(@Param('listId', ParseIntPipe) listId: number) {
+    return this.cardsService.findAll(listId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cardsService.findOne(+id);
+  @ApiFindOneCardDocs()
+  @UseGuards(
+    AuthGuard('jwt'),
+    BoardPermissionsGuard,
+    ListBelongsToBoardGuard,
+    CardBelongsToListGuard,
+  )
+  @Permissions('card_read')
+  @Get(':cardId')
+  findOne(
+    @Param('listId', ParseIntPipe) listId: number,
+    @Param('cardId', ParseIntPipe) cardId: number,
+  ) {
+    return this.cardsService.findOne(listId, cardId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCardDto: UpdateCardDto) {
-    return this.cardsService.update(+id, updateCardDto);
+  @UseGuards(
+    AuthGuard('jwt'),
+    BoardPermissionsGuard,
+    ListBelongsToBoardGuard,
+    CardBelongsToListGuard,
+  )
+  @ApiUpdateCardDocs()
+  @Permissions('card_update')
+  @Put(':cardId')
+  update(
+    @Param('listId', ParseIntPipe) listId: number,
+    @Param('cardId', ParseIntPipe) cardId: number,
+    @Body() updateCardDto: UpdateCardDto,
+  ) {
+    return this.cardsService.update(listId, cardId, updateCardDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cardsService.remove(+id);
+  @ApiRemoveCardDocs()
+  @UseGuards(
+    AuthGuard('jwt'),
+    BoardPermissionsGuard,
+    ListBelongsToBoardGuard,
+    CardBelongsToListGuard,
+  )
+  @Permissions('card_delete')
+  @Delete(':cardId')
+  remove(
+    @Param('listId', ParseIntPipe) listId: number,
+    @Param('cardId', ParseIntPipe) cardId: number,
+  ) {
+    return this.cardsService.remove(listId, cardId);
   }
 }

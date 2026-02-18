@@ -9,7 +9,9 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { plainToInstance } from 'class-transformer';
 import { CardResponseDto } from './dto/card-response.dto';
+import { CardSummaryResponseDto } from './dto/card-summary-response.dto';
 import { Prisma } from 'generated/prisma/client';
+import { ActionResponseDto } from 'src/users/dto/action-response.dto';
 
 @Injectable()
 export class CardsService {
@@ -71,19 +73,134 @@ export class CardsService {
     }
   }
 
-  findAll() {
-    return `This action returns all cards`;
+  async findAll(listId: number) {
+    try {
+      const cards = await this.prismaService.card.findMany({
+        where: {
+          listId: listId,
+        },
+        orderBy: {
+          position: 'asc',
+        },
+      });
+
+      return plainToInstance(CardSummaryResponseDto, cards, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Failed to fetch cards.');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} card`;
+  async findOne(listId: number, cardId: number) {
+    try {
+      const card = await this.prismaService.card.findUnique({
+        where: {
+          id: cardId,
+          listId: listId,
+        },
+        include: {
+          list: {
+            select: {
+              id: true,
+              title: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
+        },
+      });
+
+      if (!card) {
+        throw new NotFoundException('Card not found');
+      }
+
+      return plainToInstance(CardResponseDto, card, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Failed to fetch card.');
+    }
   }
 
-  update(id: number, updateCardDto: UpdateCardDto) {
-    return `This action updates a #${id} card`;
+  async update(listId: number, cardId: number, updateCardDto: UpdateCardDto) {
+    try {
+      const data: Prisma.CardUpdateInput = {
+        title: updateCardDto.title,
+        description:
+          updateCardDto.description !== undefined
+            ? updateCardDto.description
+            : undefined,
+      };
+
+      const card = await this.prismaService.card.update({
+        where: { id: cardId, listId: listId },
+        data,
+        include: {
+          list: {
+            select: {
+              id: true,
+              title: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
+        },
+      });
+
+      return plainToInstance(CardResponseDto, card, {
+        excludeExtraneousValues: true,
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('Card not found');
+      }
+
+      throw new InternalServerErrorException('Failed to update card');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} card`;
+  async remove(listId: number, cardId: number) {
+    try {
+      const deleted = await this.prismaService.card.deleteMany({
+        where: {
+          id: cardId,
+          listId,
+        },
+      });
+
+      if (deleted.count === 0) {
+        throw new NotFoundException('Card not found');
+      }
+
+      return plainToInstance(
+        ActionResponseDto,
+        { message: 'Card deleted successfully' },
+        {
+          excludeExtraneousValues: true,
+        },
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Failed to delete card');
+    }
   }
 }
