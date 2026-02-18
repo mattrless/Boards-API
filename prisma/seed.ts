@@ -44,6 +44,12 @@ async function main() {
       { name: 'list_update', type: PermissionType.BOARD },
       { name: 'list_delete', type: PermissionType.BOARD },
 
+      // CARDS
+      { name: 'card_create', type: PermissionType.BOARD },
+      { name: 'card_read', type: PermissionType.BOARD },
+      { name: 'card_update', type: PermissionType.BOARD },
+      { name: 'card_delete', type: PermissionType.BOARD },
+
       // USER – admin only
       { name: 'user_update_any', type: PermissionType.SYSTEM },
       { name: 'user_delete_any', type: PermissionType.SYSTEM },
@@ -143,6 +149,10 @@ async function main() {
           'list_read',
           'list_update',
           'list_delete',
+          'card_create',
+          'card_read',
+          'card_update',
+          'card_delete',
         ],
       },
       type: PermissionType.BOARD,
@@ -152,7 +162,14 @@ async function main() {
   const memberBoardPermissions = await prisma.permission.findMany({
     where: {
       name: {
-        in: ['board_view_members', 'list_read'],
+        in: [
+          'board_view_members',
+          'list_read',
+          'card_create',
+          'card_read',
+          'card_update',
+          'card_delete',
+        ],
       },
       type: PermissionType.BOARD,
     },

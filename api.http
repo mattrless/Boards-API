@@ -180,15 +180,24 @@ Content-Type: application/json
 }
 
 ### Update list position
-PUT {{baseUrl}}/boards/1/lists/9/position
+PUT {{baseUrl}}/boards/1/lists/5/position
 Authorization: {{userToken}}
 Content-Type: application/json
 
 {  
-  "nextListId": 4
+  "nextListId": 9
 }
-
 
 ### Remove list by Id
 DELETE {{baseUrl}}/boards/1/lists/8
 Authorization: {{userToken}}
+
+### CARDS
+POST {{baseUrl}}/boards/1/lists/6/cards
+Authorization: {{userToken}}
+Content-Type: application/json
+
+{
+  "title": "my cards title",
+  "description": "my descr"
+}
