@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import {
+  ApiBody,
   ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
@@ -126,6 +127,35 @@ export function ApiUpdateListPositionDocs() {
       name: 'listId',
       type: Number,
       description: 'Target list id.',
+    }),
+    ApiBody({
+      schema: {
+        oneOf: [
+          {
+            type: 'object',
+            properties: {
+              prevListId: { type: 'integer', minimum: 1 },
+            },
+            required: ['prevListId'],
+          },
+          {
+            type: 'object',
+            properties: {
+              nextListId: { type: 'integer', minimum: 1 },
+            },
+            required: ['nextListId'],
+          },
+          {
+            type: 'object',
+            properties: {
+              prevListId: { type: 'integer', minimum: 1 },
+              nextListId: { type: 'integer', minimum: 1 },
+            },
+            required: ['prevListId', 'nextListId'],
+          },
+        ],
+        additionalProperties: false,
+      },
     }),
     ApiOkResponse({
       description: 'List position updated successfully.',

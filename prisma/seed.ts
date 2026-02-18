@@ -205,7 +205,7 @@ async function main() {
     update: {},
     create: {
       email: 'admin@local.dev',
-      password: '$2b$10$6tCJm9jtxnya/5XEgjsOwOsRNRqHRaRIftDdc/hHc3pRgu0h/Dx3C',
+      password: '$2b$10$DL6xGPf3TGlomFl.yV5tt.b1MNiNHl6SBWLH3gdzU/E59Ary3YOji',
       profileId: adminProfile.id,
       systemRoleId: adminRole.id,
     },

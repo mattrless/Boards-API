@@ -9,22 +9,22 @@ import {
   ParseIntPipe,
   Put,
 } from '@nestjs/common';
-import { CardsService } from './cards.service';
-import { CreateCardDto } from './dto/create-card.dto';
-import { UpdateCardDto } from './dto/update-card.dto';
 import { Permissions } from 'src/auth/decorators/permissions.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { ListBelongsToBoardGuard } from 'src/lists/guards/list-belongs-to-board.guard';
 import { BoardPermissionsGuard } from 'src/auth/guards/board-permissions.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { CardsService } from '../services/cards.service';
 import {
   ApiCreateCardDocs,
   ApiFindAllCardsDocs,
   ApiFindOneCardDocs,
   ApiRemoveCardDocs,
   ApiUpdateCardDocs,
-} from './docs/cards.docs';
-import { CardBelongsToListGuard } from './guards/card-belongs-to-list.guard';
+} from '../docs/cards.docs';
+import { CreateCardDto } from '../dto/create-card.dto';
+import { CardBelongsToListGuard } from '../guards/card-belongs-to-list.guard';
+import { UpdateCardDto } from '../dto/update-card.dto';
 
 @ApiTags('Cards')
 @Controller('boards/:boardId/lists/:listId/cards')

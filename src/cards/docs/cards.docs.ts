@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import {
+  ApiBody,
   ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
@@ -68,7 +69,87 @@ export function ApiUpdateCardDocs() {
       description:
         'Forbidden: current user is not a board member or lacks permission.',
     }),
-    ApiResponse({ status: 404, description: 'Board, list, or card not found.' }),
+    ApiResponse({
+      status: 404,
+      description: 'Board, list, or card not found.',
+    }),
+    ApiBearerAuth('JWT'),
+  );
+}
+
+export function ApiUpdateCardPositionDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Move a card to a new position' }),
+    ApiParam({
+      name: 'boardId',
+      type: Number,
+      description: 'Target board id.',
+    }),
+    ApiParam({
+      name: 'cardId',
+      type: Number,
+      description: 'Target card id.',
+    }),
+    ApiBody({
+      schema: {
+        oneOf: [
+          {
+            type: 'object',
+            description:
+              'Valid when destination list is empty (or only contains the moved card).',
+            properties: {},
+          },
+          {
+            type: 'object',
+            properties: {
+              targetListId: { type: 'integer', minimum: 1 },
+            },
+            required: ['targetListId'],
+          },
+          {
+            type: 'object',
+            properties: {
+              targetListId: { type: 'integer', minimum: 1 },
+              prevCardId: { type: 'integer', minimum: 1 },
+            },
+            required: ['prevCardId'],
+          },
+          {
+            type: 'object',
+            properties: {
+              targetListId: { type: 'integer', minimum: 1 },
+              nextCardId: { type: 'integer', minimum: 1 },
+            },
+            required: ['nextCardId'],
+          },
+          {
+            type: 'object',
+            properties: {
+              targetListId: { type: 'integer', minimum: 1 },
+              prevCardId: { type: 'integer', minimum: 1 },
+              nextCardId: { type: 'integer', minimum: 1 },
+            },
+            required: ['prevCardId', 'nextCardId'],
+          },
+        ],
+        additionalProperties: false,
+      },
+    }),
+    ApiOkResponse({
+      description: 'Card position updated successfully.',
+      type: CardResponseDto,
+    }),
+    ApiResponse({ status: 400, description: 'Invalid input data.' }),
+    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({
+      status: 403,
+      description:
+        'Forbidden: current user is not a board member or lacks permission.',
+    }),
+    ApiResponse({
+      status: 404,
+      description: 'Board, list, or card not found.',
+    }),
     ApiBearerAuth('JWT'),
   );
 }
@@ -129,7 +210,10 @@ export function ApiFindOneCardDocs() {
       description:
         'Forbidden: current user is not a board member or lacks permission.',
     }),
-    ApiResponse({ status: 404, description: 'Board, list, or card not found.' }),
+    ApiResponse({
+      status: 404,
+      description: 'Board, list, or card not found.',
+    }),
     ApiBearerAuth('JWT'),
   );
 }
@@ -162,7 +246,10 @@ export function ApiRemoveCardDocs() {
       description:
         'Forbidden: current user is not a board member or lacks permission.',
     }),
-    ApiResponse({ status: 404, description: 'Board, list, or card not found.' }),
+    ApiResponse({
+      status: 404,
+      description: 'Board, list, or card not found.',
+    }),
     ApiBearerAuth('JWT'),
   );
 }

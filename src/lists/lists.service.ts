@@ -262,6 +262,46 @@ export class ListsService {
           }
         }
 
+        if (prevList && !nextList) {
+          const lastList = await tx.list.findFirst({
+            where: {
+              boardId,
+            },
+            orderBy: {
+              position: 'desc',
+            },
+            select: {
+              id: true,
+            },
+          });
+
+          if (!lastList || lastList.id !== prevList.id) {
+            throw new BadRequestException(
+              'To move a list to the middle, provide both prevListId and nextListId',
+            );
+          }
+        }
+
+        if (nextList && !prevList) {
+          const firstList = await tx.list.findFirst({
+            where: {
+              boardId,
+            },
+            orderBy: {
+              position: 'asc',
+            },
+            select: {
+              id: true,
+            },
+          });
+
+          if (!firstList || firstList.id !== nextList.id) {
+            throw new BadRequestException(
+              'To move a list to the middle, provide both prevListId and nextListId',
+            );
+          }
+        }
+
         let newPosition: number;
 
         if (prevList && nextList) {

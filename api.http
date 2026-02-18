@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:3000
-@userToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc3MTI3MDM4NCwiZXhwIjoxNzcxNDQzMTg0fQ.N8XBbWTpDxp1whjGQRgfldl5LHj3-MsTjS0hx_CvSns
-@adminToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc3MTQzMzM1NCwiZXhwIjoxNzcxNjA2MTU0fQ.cZQ7yqSUa1eRYQwS85fbpjwmHsyGLhcXv1vtaiR85lw
-@user2Token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImlhdCI6MTc3MTI3NzA2OSwiZXhwIjoxNzcxNDQ5ODY5fQ.bh2xHF30tNmHLE2EEYf8jvEeWhIQWZ8J_91rKpue4LY
+@userToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc3MTQzOTUwOSwiZXhwIjoxNzcxNjEyMzA5fQ.B4HCH551ScSBQNvRtnqLBZil_MjKMjn9pJJeLnaD3cM
+@adminToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc3MTQzOTU3MSwiZXhwIjoxNzcxNjEyMzcxfQ.Z9aqUzwdtepq4Q-s_EkUh6KpD_-RSrInukZB4hEz7i4
+@user2Token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImlhdCI6MTc3MTQzOTUyNywiZXhwIjoxNzcxNjEyMzI3fQ.9nm4yxEDpeg42p5JpN08QgCTtF-y14fDXXnvL7_XF4I
 
 ### AUTH
 
@@ -29,7 +29,7 @@ POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
-  "email": "userO@local.dev",
+  "email": "userP@local.dev",
   "password": "12345",
   "profile": {
     "name": "Carlos"
@@ -154,6 +154,7 @@ Authorization: {{userToken}}
 
 
 ### LISTS
+### Create list
 POST {{baseUrl}}/boards/1/lists
 Authorization: {{userToken}}
 Content-Type: application/json
@@ -193,7 +194,8 @@ DELETE {{baseUrl}}/boards/1/lists/8
 Authorization: {{userToken}}
 
 ### CARDS
-POST {{baseUrl}}/boards/1/lists/6/cards
+### Create card
+POST {{baseUrl}}/boards/1/lists/2/cards
 Authorization: {{userToken}}
 Content-Type: application/json
 
@@ -213,13 +215,22 @@ Content-Type: application/json
 }
 
 ### Get cards by list Id
-GET {{baseUrl}}/boards/1/lists/6/cards
+GET {{baseUrl}}/boards/1/lists/1/cards
 Authorization: {{userToken}}
 
 ### Get card by Id
-GET {{baseUrl}}/boards/1/lists/6/cards/3
+GET {{baseUrl}}/boards/1/lists/6/cards/5
 Authorization: {{userToken}}
 
 ### Remove card by Id
 DELETE {{baseUrl}}/boards/1/lists/6/cards/3
 Authorization: {{userToken}}
+
+### Update card position
+PUT {{baseUrl}}/boards/1/cards/8/position
+Authorization: {{userToken}}
+Content-Type: application/json
+
+{
+  "targetListId": 3
+}
