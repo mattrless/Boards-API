@@ -118,12 +118,12 @@ PUT {{baseUrl}}/boards/8/restore
 Authorization: {{userToken}}
 
 ### Add user as member to board
-POST {{baseUrl}}/boards/9/invite
+POST {{baseUrl}}/boards/1/invite
 Authorization: {{userToken}}
 Content-Type: application/json
 
 {
-  "email": "john.doe@example.com"
+  "email": "userP@local.dev"
 }
 
 ### Remove member from board
@@ -219,7 +219,7 @@ GET {{baseUrl}}/boards/1/lists/1/cards
 Authorization: {{userToken}}
 
 ### Get card by Id
-GET {{baseUrl}}/boards/1/lists/6/cards/5
+GET {{baseUrl}}/boards/1/lists/1/cards/1
 Authorization: {{userToken}}
 
 ### Remove card by Id
@@ -234,3 +234,23 @@ Content-Type: application/json
 {
   "targetListId": 3
 }
+
+### CARD MEMBERS
+### Add user to card
+POST {{baseUrl}}/boards/1/cards/1/members
+Authorization: {{userToken}}
+Content-Type: application/json
+
+{
+  "userId": 3
+}
+
+### Remove user from card
+DELETE {{baseUrl}}/boards/1/cards/1/members/3
+Authorization: {{userToken}}
+Content-Type: application/json
+
+### Get members of a card by id
+GET  {{baseUrl}}/boards/1/cards/1/members
+Authorization: {{userToken}}
+Content-Type: application/json
