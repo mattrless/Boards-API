@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { BoardsModule } from './boards/boards.module';
 import { ListsModule } from './lists/lists.module';
 import { CardsModule } from './cards/cards.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CardsModule } from './cards/cards.module';
     BoardsModule,
     ListsModule,
     CardsModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
