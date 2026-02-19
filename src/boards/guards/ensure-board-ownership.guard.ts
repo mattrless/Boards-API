@@ -29,7 +29,7 @@ export class EnsureBoardOwnershipGuard implements CanActivate {
     }
 
     const board = await this.prismaService.board.findFirst({
-      where: { id: boardId, deletedAt: null },
+      where: { id: boardId },
       select: { ownerId: true },
     });
 

@@ -63,6 +63,11 @@ export function ApiRemoveMeDocs() {
     ApiOperation({ summary: 'Delete the authenticated user account' }),
     ApiOkResponse({ description: 'Account deleted successfully.' }),
     ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({
+      status: 409,
+      description:
+        'Conflict: user owns one or more boards and must transfer ownership first.',
+    }),
     ApiBearerAuth('JWT'),
   );
 }

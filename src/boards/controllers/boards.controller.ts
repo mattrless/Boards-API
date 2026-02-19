@@ -81,7 +81,7 @@ export class BoardsController {
   }
 
   @ApiRestoreBoardDocs()
-  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard, EnsureBoardOwnershipGuard)
   @Permissions('board_restore')
   @Put(':boardId/restore')
   restore(@Param('boardId', ParseIntPipe) boardId: number) {

@@ -36,6 +36,11 @@ export function ApiAdminRemoveUserDocs() {
       status: 403,
       description: 'Forbidden: Insufficient permissions.',
     }),
+    ApiResponse({
+      status: 409,
+      description:
+        'Conflict: user owns one or more boards and must transfer ownership first.',
+    }),
     ApiResponse({ status: 404, description: 'User not found.' }),
     ApiBearerAuth('JWT'),
   );

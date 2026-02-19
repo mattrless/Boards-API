@@ -173,6 +173,40 @@ export class UsersService {
   }
 
   async remove(id: number) {
+    const ownedBoards = await this.prismaService.board.findMany({
+      where: {
+        ownerId: id,
+      },
+      select: {
+        deletedAt: true,
+      },
+    });
+
+    if (ownedBoards.length > 0) {
+      const ownsActiveBoards = ownedBoards.some(
+        (board) => board.deletedAt === null,
+      );
+      const ownsArchivedBoards = ownedBoards.some(
+        (board) => board.deletedAt !== null,
+      );
+
+      if (ownsActiveBoards && ownsArchivedBoards) {
+        throw new ConflictException(
+          'Cannot delete user: transfer ownership of active boards and archived boards before deleting the user.',
+        );
+      }
+
+      if (ownsActiveBoards) {
+        throw new ConflictException(
+          'Cannot delete user: transfer ownership of active boards before deleting the user.',
+        );
+      }
+
+      throw new ConflictException(
+        'Cannot delete user: transfer ownership of archived boards before deleting the user.',
+      );
+    }
+
     await this.prismaService.user.update({
       where: { id },
       data: { deletedAt: new Date() },
