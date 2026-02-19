@@ -6,9 +6,9 @@ import {
   ApiParam,
   ApiResponse,
 } from '@nestjs/swagger';
-import { BoardOwnerResponseDto } from '../dto/board-owner-response.dto';
 import { BoardResponseDto } from '../dto/board-response.dto';
 import { ActionResponseDto } from 'src/users/dto/action-response.dto';
+import { BoardDetailsResponseDto } from '../dto/board-details-response.dto';
 
 export function ApiCreateBoardDocs() {
   return applyDecorators(
@@ -46,7 +46,7 @@ export function ApiFindOneBoardDocs() {
     ApiOperation({ summary: 'Get a specific board by ID' }),
     ApiOkResponse({
       description: 'Board found and returned.',
-      type: BoardOwnerResponseDto,
+      type: BoardDetailsResponseDto,
     }),
     ApiResponse({ status: 404, description: 'Board not found.' }),
     ApiBearerAuth('JWT'),

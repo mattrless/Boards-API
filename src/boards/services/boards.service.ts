@@ -13,6 +13,7 @@ import { BoardResponseDto } from '../dto/board-response.dto';
 import { Prisma } from 'generated/prisma/client';
 import { BoardOwnerResponseDto } from '../dto/board-owner-response.dto';
 import { UpdateBoardDto } from '../dto/update-board.dto';
+import { BoardDetailsResponseDto } from '../dto/board-details-response.dto';
 
 @Injectable()
 export class BoardsService {
@@ -86,9 +87,74 @@ export class BoardsService {
   }
 
   async findOne(id: number) {
-    const board = await this.getBoardById(id);
+    const board = await this.prismaService.board.findFirst({
+      where: {
+        id,
+        deletedAt: null,
+      },
+      include: {
+        owner: true,
+        lists: {
+          orderBy: { position: 'asc' },
+          include: {
+            cards: {
+              orderBy: { position: 'asc' },
+              include: {
+                cardAssignments: {
+                  where: {
+                    user: {
+                      deletedAt: null,
+                    },
+                  },
+                  orderBy: {
+                    createdAt: 'asc',
+                  },
+                  select: {
+                    createdAt: true,
+                    user: {
+                      select: {
+                        id: true,
+                        email: true,
+                        profile: {
+                          select: {
+                            name: true,
+                            avatar: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
-    return plainToInstance(BoardOwnerResponseDto, board, {
+    if (!board) {
+      throw new NotFoundException('Board not found');
+    }
+
+    const boardWithDetails = {
+      ...board,
+      lists: board.lists.map((list) => ({
+        ...list,
+        cards: list.cards.map((card) => ({
+          ...card,
+          members: card.cardAssignments.map((assignment) => ({
+            user: {
+              id: assignment.user.id,
+              email: assignment.user.email,
+              profile: assignment.user.profile,
+            },
+            assignedAt: assignment.createdAt,
+          })),
+        })),
+      })),
+    };
+
+    return plainToInstance(BoardDetailsResponseDto, boardWithDetails, {
       excludeExtraneousValues: true,
     });
   }

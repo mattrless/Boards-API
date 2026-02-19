@@ -96,7 +96,7 @@ GET {{baseUrl}}/boards
 Authorization: {{userToken}}
 
 ### Get board by id
-GET {{baseUrl}}/boards/7
+GET {{baseUrl}}/boards/1
 Authorization: {{userToken}}
 
 ### Update board
