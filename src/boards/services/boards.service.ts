@@ -14,10 +14,14 @@ import { Prisma } from 'generated/prisma/client';
 import { BoardOwnerResponseDto } from '../dto/board-owner-response.dto';
 import { UpdateBoardDto } from '../dto/update-board.dto';
 import { BoardDetailsResponseDto } from '../dto/board-details-response.dto';
+import { BoardEventsService } from 'src/websocket/services/boards-events.service';
 
 @Injectable()
 export class BoardsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly boardEventsService: BoardEventsService,
+  ) {}
 
   async create(ownerId: number, createBoardDto: CreateBoardDto) {
     try {
@@ -50,6 +54,18 @@ export class BoardsService {
         });
 
         return createdBoard;
+      });
+
+      this.boardEventsService.emitBoardCreated(board.id, {
+        boardId: board.id,
+        actorId: ownerId,
+        data: board,
+        timestamp: new Date().toISOString(),
+      });
+      this.boardEventsService.emitUserBoardsChanged(ownerId, {
+        boardId: board.id,
+        reason: 'board:created',
+        timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(BoardResponseDto, board, {
@@ -162,6 +178,17 @@ export class BoardsService {
   async update(id: number, updateBoardDto: UpdateBoardDto) {
     try {
       await this.getBoardById(id);
+      const memberIds = await this.prismaService.userBoard.findMany({
+        where: {
+          boardId: id,
+          user: {
+            deletedAt: null,
+          },
+        },
+        select: {
+          userId: true,
+        },
+      });
 
       const data: Prisma.BoardUpdateInput = {
         name: updateBoardDto.name,
@@ -174,6 +201,25 @@ export class BoardsService {
           owner: true,
         },
       });
+
+      this.boardEventsService.emitBoardUpdated(board.id, {
+        boardId: board.id,
+        entityId: board.id,
+        data: {
+          id: board.id,
+          name: board.name,
+          ownerId: board.ownerId,
+          updatedAt: board.updatedAt,
+        },
+        timestamp: new Date().toISOString(),
+      });
+      for (const member of memberIds) {
+        this.boardEventsService.emitUserBoardsChanged(member.userId, {
+          boardId: board.id,
+          reason: 'board:updated',
+          timestamp: new Date().toISOString(),
+        });
+      }
 
       return plainToInstance(BoardOwnerResponseDto, board, {
         excludeExtraneousValues: true,
@@ -194,6 +240,18 @@ export class BoardsService {
   }
 
   async remove(id: number) {
+    const memberIds = await this.prismaService.userBoard.findMany({
+      where: {
+        boardId: id,
+        user: {
+          deletedAt: null,
+        },
+      },
+      select: {
+        userId: true,
+      },
+    });
+
     const result = await this.prismaService.board.updateMany({
       where: { id, deletedAt: null },
       data: { deletedAt: new Date() },
@@ -201,6 +259,19 @@ export class BoardsService {
 
     if (result.count === 0) {
       throw new NotFoundException('Board not found');
+    }
+
+    this.boardEventsService.emitBoardDeleted(id, {
+      boardId: id,
+      entityId: id,
+      timestamp: new Date().toISOString(),
+    });
+    for (const member of memberIds) {
+      this.boardEventsService.emitUserBoardsChanged(member.userId, {
+        boardId: id,
+        reason: 'board:deleted',
+        timestamp: new Date().toISOString(),
+      });
     }
 
     return plainToInstance(
@@ -213,6 +284,18 @@ export class BoardsService {
   }
 
   async restore(id: number) {
+    const memberIds = await this.prismaService.userBoard.findMany({
+      where: {
+        boardId: id,
+        user: {
+          deletedAt: null,
+        },
+      },
+      select: {
+        userId: true,
+      },
+    });
+
     const result = await this.prismaService.board.updateMany({
       where: {
         id,
@@ -223,6 +306,19 @@ export class BoardsService {
 
     if (result.count === 0) {
       throw new NotFoundException('Board not found or not deleted');
+    }
+
+    this.boardEventsService.emitBoardRestored(id, {
+      boardId: id,
+      entityId: id,
+      timestamp: new Date().toISOString(),
+    });
+    for (const member of memberIds) {
+      this.boardEventsService.emitUserBoardsChanged(member.userId, {
+        boardId: id,
+        reason: 'board:restored',
+        timestamp: new Date().toISOString(),
+      });
     }
 
     return plainToInstance(
@@ -309,6 +405,24 @@ export class BoardsService {
             },
           },
         });
+      });
+
+      this.boardEventsService.emitBoardOwnershipTransferred(boardId, {
+        boardId,
+        entityId: boardId,
+        previousOwnerId: board.ownerId,
+        newOwnerId: targetUserId,
+        timestamp: new Date().toISOString(),
+      });
+      this.boardEventsService.emitUserBoardsChanged(board.ownerId, {
+        boardId,
+        reason: 'board:ownershipTransferred',
+        timestamp: new Date().toISOString(),
+      });
+      this.boardEventsService.emitUserBoardsChanged(targetUserId, {
+        boardId,
+        reason: 'board:ownershipTransferred',
+        timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(

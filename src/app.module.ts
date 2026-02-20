@@ -9,6 +9,7 @@ import { BoardsModule } from './boards/boards.module';
 import { ListsModule } from './lists/lists.module';
 import { CardsModule } from './cards/cards.module';
 import { AiModule } from './ai/ai.module';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AiModule } from './ai/ai.module';
     ListsModule,
     CardsModule,
     AiModule,
+    WebsocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],

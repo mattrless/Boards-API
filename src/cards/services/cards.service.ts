@@ -14,10 +14,14 @@ import { CardResponseDto } from '../dto/card-response.dto';
 import { CardSummaryResponseDto } from '../dto/card-summary-response.dto';
 import { Card, Prisma } from 'generated/prisma/client';
 import { ActionResponseDto } from 'src/users/dto/action-response.dto';
+import { CardsEventsService } from 'src/websocket/services/cards-events.service';
 
 @Injectable()
 export class CardsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly cardsEventsService: CardsEventsService,
+  ) {}
 
   async create(boardId: number, listId: number, createCardDto: CreateCardDto) {
     try {
@@ -54,6 +58,19 @@ export class CardsService {
             },
           },
         });
+      });
+
+      this.cardsEventsService.emitCardCreated(boardId, {
+        boardId,
+        listId: card.list.id,
+        cardId: card.id,
+        data: {
+          id: card.id,
+          title: card.title,
+          description: card.description,
+          position: card.position,
+        },
+        timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(CardResponseDto, card, {
@@ -135,6 +152,19 @@ export class CardsService {
 
   async update(listId: number, cardId: number, updateCardDto: UpdateCardDto) {
     try {
+      const list = await this.prismaService.list.findUnique({
+        where: {
+          id: listId,
+        },
+        select: {
+          boardId: true,
+        },
+      });
+
+      if (!list) {
+        throw new NotFoundException('List not found');
+      }
+
       const data: Prisma.CardUpdateInput = {
         title: updateCardDto.title,
         description:
@@ -156,6 +186,19 @@ export class CardsService {
             },
           },
         },
+      });
+
+      this.cardsEventsService.emitCardUpdated(list.boardId, card.id, {
+        boardId: list.boardId,
+        listId: card.list.id,
+        cardId: card.id,
+        data: {
+          id: card.id,
+          title: card.title,
+          description: card.description,
+          position: card.position,
+        },
+        timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(CardResponseDto, card, {
@@ -381,6 +424,20 @@ export class CardsService {
         });
       });
 
+      this.cardsEventsService.emitCardMoved(boardId, card.id, {
+        boardId,
+        listId: card.list.id,
+        cardId: card.id,
+        data: {
+          id: card.id,
+          position: card.position,
+          targetListId: card.list.id,
+          prevCardId: prevCardId ?? null,
+          nextCardId: nextCardId ?? null,
+        },
+        timestamp: new Date().toISOString(),
+      });
+
       return plainToInstance(CardResponseDto, card, {
         excludeExtraneousValues: true,
       });
@@ -404,6 +461,19 @@ export class CardsService {
 
   async remove(listId: number, cardId: number) {
     try {
+      const list = await this.prismaService.list.findUnique({
+        where: {
+          id: listId,
+        },
+        select: {
+          boardId: true,
+        },
+      });
+
+      if (!list) {
+        throw new NotFoundException('List not found');
+      }
+
       const deleted = await this.prismaService.card.deleteMany({
         where: {
           id: cardId,
@@ -414,6 +484,13 @@ export class CardsService {
       if (deleted.count === 0) {
         throw new NotFoundException('Card not found');
       }
+
+      this.cardsEventsService.emitCardDeleted(list.boardId, cardId, {
+        boardId: list.boardId,
+        listId,
+        cardId,
+        timestamp: new Date().toISOString(),
+      });
 
       return plainToInstance(
         ActionResponseDto,

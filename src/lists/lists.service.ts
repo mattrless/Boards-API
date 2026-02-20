@@ -14,10 +14,14 @@ import { ListSummaryResponseDto } from './dto/list-summary-response.dto';
 import { List, Prisma } from 'generated/prisma/client';
 import { ActionResponseDto } from 'src/users/dto/action-response.dto';
 import { UpdateListPositionDto } from './dto/update-list-position.dto';
+import { ListsEventsService } from 'src/websocket/services/lists-events.service';
 
 @Injectable()
 export class ListsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly listsEventsService: ListsEventsService,
+  ) {}
 
   async create(boardId: number, createListDto: CreateListDto) {
     try {
@@ -53,6 +57,17 @@ export class ListsService {
             },
           },
         });
+      });
+
+      this.listsEventsService.emitListCreated(boardId, {
+        boardId,
+        listId: list.id,
+        data: {
+          id: list.id,
+          title: list.title,
+          position: list.position,
+        },
+        timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(ListResponseDto, list, {
@@ -152,6 +167,17 @@ export class ListsService {
         },
       });
 
+      this.listsEventsService.emitListUpdated(list.board.id, {
+        boardId: list.board.id,
+        listId: list.id,
+        data: {
+          id: list.id,
+          title: list.title,
+          position: list.position,
+        },
+        timestamp: new Date().toISOString(),
+      });
+
       return plainToInstance(ListResponseDto, list, {
         excludeExtraneousValues: true,
       });
@@ -173,10 +199,30 @@ export class ListsService {
 
   async remove(listId: number) {
     try {
+      const existingList = await this.prismaService.list.findUnique({
+        where: {
+          id: listId,
+        },
+        select: {
+          id: true,
+          boardId: true,
+        },
+      });
+
+      if (!existingList) {
+        throw new NotFoundException('List not found');
+      }
+
       await this.prismaService.list.delete({
         where: {
           id: listId,
         },
+      });
+
+      this.listsEventsService.emitListDeleted(existingList.boardId, {
+        boardId: existingList.boardId,
+        listId: existingList.id,
+        timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(
@@ -336,6 +382,18 @@ export class ListsService {
             },
           },
         });
+      });
+
+      this.listsEventsService.emitListMoved(boardId, {
+        boardId,
+        listId: list.id,
+        data: {
+          id: list.id,
+          position: list.position,
+          prevListId: prevListId ?? null,
+          nextListId: nextListId ?? null,
+        },
+        timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(ListResponseDto, list, {

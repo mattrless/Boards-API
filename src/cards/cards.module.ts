@@ -6,8 +6,10 @@ import { CardBelongsToBoardGuard } from './guards/card-belongs-to-board.guard';
 import { CardsController } from './controllers/cards.controller';
 import { CardMembersController } from './controllers/card-members.controller';
 import { CardMembersService } from './services/card-members.service';
+import { WebsocketModule } from 'src/websocket/websocket.module';
 
 @Module({
+  imports: [WebsocketModule],
   controllers: [
     CardsController,
     CardsPositionController,

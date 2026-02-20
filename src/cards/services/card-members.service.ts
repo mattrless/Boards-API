@@ -13,10 +13,14 @@ import { Prisma } from 'generated/prisma/client';
 import { CardMemberResponseDto } from '../dto/card-members-response.dto';
 import { AddCardMemberDto } from '../dto/add-card-member.dto';
 import { AuthUser } from 'src/auth/types/auth-user.type';
+import { CardsEventsService } from 'src/websocket/services/cards-events.service';
 
 @Injectable()
 export class CardMembersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly cardsEventsService: CardsEventsService,
+  ) {}
 
   async addMember(
     currentUser: AuthUser,
@@ -85,6 +89,14 @@ export class CardMembersService {
           cardId,
           userId: targetUserId,
         },
+      });
+
+      this.cardsEventsService.emitCardMemberAdded(boardId, cardId, {
+        boardId,
+        cardId,
+        targetUserId,
+        actorId: currentUserId,
+        timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(
@@ -186,6 +198,14 @@ export class CardMembersService {
       if (deleted.count === 0) {
         throw new NotFoundException('Member is not assigned to this card.');
       }
+
+      this.cardsEventsService.emitCardMemberRemoved(boardId, cardId, {
+        boardId,
+        cardId,
+        targetUserId,
+        actorId: currentUserId,
+        timestamp: new Date().toISOString(),
+      });
 
       return plainToInstance(
         ActionResponseDto,

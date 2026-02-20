@@ -15,6 +15,7 @@ import { AddMemberDto } from '../dto/add-member.dto';
 import { UsersService } from 'src/users/users.service';
 import { UpdateBoardMemberRoleDto } from '../dto/update-board-member-role.dto';
 import { BoardMemberResponseDto } from '../dto/board-members-response.dto';
+import { BoardEventsService } from 'src/websocket/services/boards-events.service';
 
 @Injectable()
 export class BoardMembersService {
@@ -22,6 +23,7 @@ export class BoardMembersService {
     private readonly prismaService: PrismaService,
     private readonly usersService: UsersService,
     private readonly boardsService: BoardsService,
+    private readonly boardEventsService: BoardEventsService,
   ) {}
 
   async addMember(
@@ -43,6 +45,18 @@ export class BoardMembersService {
           userId: user.id,
           boardRoleId: memberRoleId,
         },
+      });
+
+      this.boardEventsService.emitBoardMemberAdded(boardId, {
+        boardId,
+        targetUserId: user.id,
+        role: 'member',
+        timestamp: new Date().toISOString(),
+      });
+      this.boardEventsService.emitUserBoardsChanged(user.id, {
+        boardId,
+        reason: 'board:memberAdded',
+        timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(
@@ -146,6 +160,18 @@ export class BoardMembersService {
             userId: targetUserId,
           },
         },
+      });
+
+      this.boardEventsService.emitBoardMemberRemoved(boardId, {
+        boardId,
+        actorId: currentUserId,
+        targetUserId,
+        timestamp: new Date().toISOString(),
+      });
+      this.boardEventsService.emitUserBoardsChanged(targetUserId, {
+        boardId,
+        reason: 'board:memberRemoved',
+        timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(
@@ -264,6 +290,19 @@ export class BoardMembersService {
         data: {
           boardRoleId: targetRoleId,
         },
+      });
+
+      this.boardEventsService.emitBoardMemberRoleUpdated(boardId, {
+        boardId,
+        actorId: currentUserId,
+        targetUserId,
+        role: updateBoardMemberRoleDto.role,
+        timestamp: new Date().toISOString(),
+      });
+      this.boardEventsService.emitUserBoardsChanged(targetUserId, {
+        boardId,
+        reason: 'board:memberRoleUpdated',
+        timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(

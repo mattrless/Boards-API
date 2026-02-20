@@ -100,13 +100,12 @@ GET {{baseUrl}}/boards/1
 Authorization: {{userToken}}
 
 ### Update board
-PUT {{baseUrl}}/boards/70
+PUT {{baseUrl}}/boards/1
 Authorization: {{userToken}}
 Content-Type: application/json
 
 {
-  "name": "board de pruebad",
-  "ownerId": 40
+  "name": "board de pruebadWS2"
 }
 
 ### Soft delete board by id
@@ -127,13 +126,8 @@ Content-Type: application/json
 }
 
 ### Remove member from board
-DELETE {{baseUrl}}/boards/9/remove/3
+DELETE {{baseUrl}}/boards/1/remove/3
 Authorization: {{userToken}}
-Content-Type: application/json
-
-{
-  "email": "userP@local.dev"
-}
 
 ### Update board member role
 PUT {{baseUrl}}/boards/9/members/4/role
@@ -145,7 +139,7 @@ Content-Type: application/json
 }
 
 ### Get board members with board roles by board id
-GET {{baseUrl}}/boards/9/members
+GET {{baseUrl}}/boards/1/members
 Authorization: {{userToken}}
 
 ### Transfer ownership

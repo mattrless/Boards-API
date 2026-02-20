@@ -8,9 +8,10 @@ import { BoardMembersService } from './services/board-members.service';
 import { UsersModule } from 'src/users/users.module';
 import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
 import { BoardPermissionsGuard } from 'src/auth/guards/board-permissions.guard';
+import { WebsocketModule } from 'src/websocket/websocket.module';
 
 @Module({
-  imports: [UsersModule],
+  imports: [UsersModule, WebsocketModule],
   controllers: [BoardsController, BoardMembersController],
   providers: [
     BoardsService,
