@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AsyncApiDocumentBuilder, AsyncApiModule } from 'nestjs-asyncapi';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -30,10 +31,24 @@ async function bootstrap() {
     )
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, documentFactory, {
+  SwaggerModule.setup('rest-docs', app, documentFactory, {
     jsonDocumentUrl: 'swagger/json',
   });
 
+  const asyncApiOptions = new AsyncApiDocumentBuilder()
+    .setTitle('Boards Realtime API')
+    .setDescription('WebSocket events for boards, lists, and cards.')
+    .setVersion('1.0')
+    .setDefaultContentType('application/json')
+    .addServer('boards-ws', {
+      url: 'ws://localhost:3000',
+      protocol: 'socket.io',
+    })
+    .build();
+
+  const asyncApiDocument = AsyncApiModule.createDocument(app, asyncApiOptions);
+  await AsyncApiModule.setup('ws-docs', app, asyncApiDocument);
+
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+void bootstrap();
