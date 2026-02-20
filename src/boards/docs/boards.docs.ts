@@ -9,6 +9,8 @@ import {
 import { BoardResponseDto } from '../dto/board-response.dto';
 import { ActionResponseDto } from 'src/users/dto/action-response.dto';
 import { BoardDetailsResponseDto } from '../dto/board-details-response.dto';
+import { BoardOwnerResponseDto } from '../dto/board-owner-response.dto';
+import { MyBoardResponseDto } from '../dto/my-board-response.dto';
 
 export function ApiCreateBoardDocs() {
   return applyDecorators(
@@ -31,7 +33,22 @@ export function ApiFindAllBoardsDocs() {
     ApiOperation({ summary: 'Retrieve all boards' }),
     ApiOkResponse({
       description: 'List of all boards returned successfully.',
-      type: [BoardResponseDto],
+      type: [BoardOwnerResponseDto],
+    }),
+    ApiResponse({
+      status: 403,
+      description: 'Forbidden: Insufficient permissions.',
+    }),
+    ApiBearerAuth('JWT'),
+  );
+}
+
+export function ApiFindMyBoardsDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Retrieve boards where current user is a member' }),
+    ApiOkResponse({
+      description: 'List of user boards returned successfully.',
+      type: [MyBoardResponseDto],
     }),
     ApiResponse({
       status: 403,

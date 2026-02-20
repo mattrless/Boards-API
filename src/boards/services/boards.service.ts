@@ -15,6 +15,7 @@ import { BoardOwnerResponseDto } from '../dto/board-owner-response.dto';
 import { UpdateBoardDto } from '../dto/update-board.dto';
 import { BoardDetailsResponseDto } from '../dto/board-details-response.dto';
 import { BoardEventsService } from 'src/websocket/services/boards-events.service';
+import { MyBoardResponseDto } from '../dto/my-board-response.dto';
 
 @Injectable()
 export class BoardsService {
@@ -92,13 +93,55 @@ export class BoardsService {
         where: {
           deletedAt: null,
         },
+        include: {
+          owner: true,
+        },
       });
 
-      return plainToInstance(BoardResponseDto, boards, {
+      return plainToInstance(BoardOwnerResponseDto, boards, {
         excludeExtraneousValues: true,
       });
     } catch {
       throw new InternalServerErrorException('Failed to fetch boards');
+    }
+  }
+
+  async findMyBoards(userId: number) {
+    try {
+      const boards = await this.prismaService.board.findMany({
+        where: {
+          deletedAt: null,
+          userBoards: {
+            some: {
+              userId,
+              user: {
+                deletedAt: null,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          createdAt: true,
+          updatedAt: true,
+          ownerId: true,
+        },
+      });
+
+      const payload = boards.map((board) => ({
+        id: board.id,
+        name: board.name,
+        createdAt: board.createdAt,
+        updatedAt: board.updatedAt,
+        isOwner: board.ownerId === userId,
+      }));
+
+      return plainToInstance(MyBoardResponseDto, payload, {
+        excludeExtraneousValues: true,
+      });
+    } catch {
+      throw new InternalServerErrorException('Failed to fetch user boards');
     }
   }
 

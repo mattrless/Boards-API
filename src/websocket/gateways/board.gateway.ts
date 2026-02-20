@@ -122,6 +122,33 @@ export class BoardGateway
       return { ok: false, error: 'boardId must be a positive integer' };
     }
 
+    const userId = client.data.userId;
+    if (!this.isValidId(userId)) {
+      return { ok: false, error: 'Socket is not authenticated' };
+    }
+
+    const board = await this.prismaService.board.findFirst({
+      where: {
+        id: body.boardId,
+        deletedAt: null,
+        userBoards: {
+          some: {
+            userId,
+            user: {
+              deletedAt: null,
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!board) {
+      return { ok: false, error: 'Board not found or access denied' };
+    }
+
     await client.join(`board:${body.boardId}`);
     return { ok: true, room: `board:${body.boardId}` };
   }

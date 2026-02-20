@@ -22,6 +22,7 @@ import { BoardsService } from '../services/boards.service';
 import {
   ApiCreateBoardDocs,
   ApiFindAllBoardsDocs,
+  ApiFindMyBoardsDocs,
   ApiFindOneBoardDocs,
   ApiRemoveBoardDocs,
   ApiRestoreBoardDocs,
@@ -51,6 +52,14 @@ export class BoardsController {
   @Get()
   findAll() {
     return this.boardsService.findAll();
+  }
+
+  @ApiFindMyBoardsDocs()
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('board_read')
+  @Get('me')
+  findMyBoards(@CurrentUser('id', UserExistsPipe) userId: number) {
+    return this.boardsService.findMyBoards(userId);
   }
 
   @ApiFindOneBoardDocs()

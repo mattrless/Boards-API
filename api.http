@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:3000
-@userToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc3MTQzOTUwOSwiZXhwIjoxNzcxNjEyMzA5fQ.B4HCH551ScSBQNvRtnqLBZil_MjKMjn9pJJeLnaD3cM
+@userToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc3MTYyMDg4OSwiZXhwIjoxNzcxNzkzNjg5fQ.S8LNDQouEMxCwSMSOqTGvyWpjYpSo2LHbkcDPX6rOss
 @adminToken = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc3MTQzOTU3MSwiZXhwIjoxNzcxNjEyMzcxfQ.Z9aqUzwdtepq4Q-s_EkUh6KpD_-RSrInukZB4hEz7i4
-@user2Token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImlhdCI6MTc3MTQzOTUyNywiZXhwIjoxNzcxNjEyMzI3fQ.9nm4yxEDpeg42p5JpN08QgCTtF-y14fDXXnvL7_XF4I
+@user2Token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImlhdCI6MTc3MTYxOTkxOCwiZXhwIjoxNzcxNzkyNzE4fQ.wm3cCmRoTu3VCMzlN_ZxEQ5ly_fGx9OT_tAHzBWz178
 
 ### AUTH
 
@@ -10,7 +10,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@local.dev",
+  "email": "userO@local.dev",
   "password": "12345"
 }
 
@@ -166,7 +166,7 @@ GET {{baseUrl}}/boards/1/lists/9
 Authorization: {{userToken}}
 
 ### Update list
-PUT {{baseUrl}}/boards/1/lists/8
+PUT {{baseUrl}}/boards/1/lists/4
 Authorization: {{userToken}}
 Content-Type: application/json
 
@@ -175,21 +175,22 @@ Content-Type: application/json
 }
 
 ### Update list position
-PUT {{baseUrl}}/boards/1/lists/5/position
+PUT {{baseUrl}}/boards/1/lists/4/position
 Authorization: {{userToken}}
 Content-Type: application/json
 
 {  
-  "nextListId": 9
+  "prevListId": 2,
+  "nextListId": 3
 }
 
 ### Remove list by Id
-DELETE {{baseUrl}}/boards/1/lists/8
+DELETE {{baseUrl}}/boards/1/lists/7
 Authorization: {{userToken}}
 
 ### CARDS
 ### Create card
-POST {{baseUrl}}/boards/1/lists/2/cards
+POST {{baseUrl}}/boards/1/lists/10/cards
 Authorization: {{userToken}}
 Content-Type: application/json
 
@@ -199,17 +200,17 @@ Content-Type: application/json
 }
 
 ### Update card
-PUT {{baseUrl}}/boards/1/lists/6/cards/3
+PUT {{baseUrl}}/boards/1/lists/1/cards/11
 Authorization: {{userToken}}
 Content-Type: application/json
 
 {
-  "title": "my cards title UP",
+  "title": "my cards title UPda",
   "description": "my descrUP"
 }
 
 ### Get cards by list Id
-GET {{baseUrl}}/boards/1/lists/1/cards
+GET {{baseUrl}}/boards/1/lists/10/cards
 Authorization: {{userToken}}
 
 ### Get card by Id
@@ -217,21 +218,23 @@ GET {{baseUrl}}/boards/1/lists/1/cards/1
 Authorization: {{userToken}}
 
 ### Remove card by Id
-DELETE {{baseUrl}}/boards/1/lists/6/cards/3
+DELETE {{baseUrl}}/boards/1/lists/10/cards/11
 Authorization: {{userToken}}
 
 ### Update card position
-PUT {{baseUrl}}/boards/1/cards/8/position
+PUT {{baseUrl}}/boards/1/cards/11/position
 Authorization: {{userToken}}
 Content-Type: application/json
 
 {
-  "targetListId": 3
+  "targetListId": 10,
+  "prevCardId": 29,
+  "nextCardId": 30
 }
 
 ### CARD MEMBERS
 ### Add user to card
-POST {{baseUrl}}/boards/1/cards/1/members
+POST {{baseUrl}}/boards/1/cards/11/members
 Authorization: {{userToken}}
 Content-Type: application/json
 
@@ -240,11 +243,10 @@ Content-Type: application/json
 }
 
 ### Remove user from card
-DELETE {{baseUrl}}/boards/1/cards/1/members/3
+DELETE {{baseUrl}}/boards/1/cards/11/members/3
 Authorization: {{userToken}}
-Content-Type: application/json
 
 ### Get members of a card by id
-GET  {{baseUrl}}/boards/1/cards/1/members
+GET  {{baseUrl}}/boards/1/cards/11/members
 Authorization: {{userToken}}
 Content-Type: application/json

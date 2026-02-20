@@ -167,7 +167,7 @@ model Card {
   position    Float
 
   listId      Int      @map("list_id")
-  list        List     @relation(fields: [listId], references: [id])
+  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
 
   cardAssignments CardAssignment[]
 
@@ -183,7 +183,7 @@ model CardAssignment {
   user        User     @relation(fields: [userId], references: [id])
 
   cardId      Int      @map("card_id")
-  card        Card     @relation(fields: [cardId], references: [id])
+  card        Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
