@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AsyncApiDocumentBuilder, AsyncApiModule } from 'nestjs-asyncapi';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -48,6 +49,11 @@ async function bootstrap() {
 
   const asyncApiDocument = AsyncApiModule.createDocument(app, asyncApiOptions);
   await AsyncApiModule.setup('ws-docs', app, asyncApiDocument);
+
+  app.use(helmet());
+  app.enableCors({
+    origin: '*',
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }
