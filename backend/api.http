@@ -10,7 +10,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "userO@local.dev",
+  "email": "admin@local.dev",
   "password": "12345"
 }
 

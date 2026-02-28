@@ -1,26 +1,42 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { GoogleGenAI } from '@google/genai';
 import { plainToInstance } from 'class-transformer';
 import { ResponseDescriptionDto } from '../dto/response-description.dto';
 
+type GeminiResponse = { text?: string | null };
+type GeminiClient = {
+  models: {
+    generateContent(input: {
+      model: string;
+      contents: string;
+    }): Promise<GeminiResponse>;
+  };
+};
+
 @Injectable()
 export class GeminiService {
-  private readonly ai: GoogleGenAI;
+  private readonly aiClientPromise: Promise<GeminiClient>;
   private readonly model: string;
 
   constructor(private readonly configService: ConfigService) {
     this.model = this.configService.getOrThrow<string>('GEMINI_MODEL');
-    this.ai = new GoogleGenAI({
+    this.aiClientPromise = this.createAiClient();
+  }
+
+  private async createAiClient(): Promise<GeminiClient> {
+    const { GoogleGenAI } = await import('@google/genai');
+
+    return new GoogleGenAI({
       apiKey: this.configService.getOrThrow<string>('GEMINI_API_KEY'),
     });
   }
 
   async generateDescription(title: string): Promise<ResponseDescriptionDto> {
-    let response: { text?: string | null };
+    let response: GeminiResponse;
+    const ai = await this.aiClientPromise;
 
     try {
-      response = await this.ai.models.generateContent({
+      response = await ai.models.generateContent({
         model: this.model,
         contents: `Eres un generador de descripciones de tareas.
           Genera exactamente una sola descripción breve para el siguiente título.
@@ -58,10 +74,11 @@ export class GeminiService {
   }
 
   async checkGrammar(description: string): Promise<ResponseDescriptionDto> {
-    let response: { text?: string | null };
+    let response: GeminiResponse;
+    const ai = await this.aiClientPromise;
 
     try {
-      response = await this.ai.models.generateContent({
+      response = await ai.models.generateContent({
         model: this.model,
         contents: `Corrige la gramática y ortografía del siguiente texto sin cambiar su intención.
           Reglas obligatorias:
