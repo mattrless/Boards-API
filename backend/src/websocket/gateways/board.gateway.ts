@@ -7,11 +7,11 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-} from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
-import { DefaultEventsMap, Server, Socket } from 'socket.io';
-import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
+} from "@nestjs/websockets";
+import { Logger } from "@nestjs/common";
+import { DefaultEventsMap, Server, Socket } from "socket.io";
+import { JwtService } from "@nestjs/jwt";
+import { PrismaService } from "src/prisma/prisma.service";
 
 type JwtPayload = {
   sub: number;
@@ -29,7 +29,7 @@ type WsSocket = Socket<
 >;
 
 @WebSocketGateway({
-  cors: { origin: '*' },
+  cors: { origin: "*" },
 })
 export class BoardGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -45,11 +45,11 @@ export class BoardGateway
   server: Server;
 
   afterInit() {
-    this.logger.log('BoardGateway initialized');
+    this.logger.log("BoardGateway initialized");
   }
 
   private isValidId(value: unknown): value is number {
-    return typeof value === 'number' && Number.isInteger(value) && value > 0;
+    return typeof value === "number" && Number.isInteger(value) && value > 0;
   }
 
   private extractToken(client: WsSocket): string | null {
@@ -58,8 +58,8 @@ export class BoardGateway
       return null;
     }
 
-    const [type, token] = authorization.split(' ');
-    if (type !== 'Bearer' || !token) {
+    const [type, token] = authorization.split(" ");
+    if (type !== "Bearer" || !token) {
       return null;
     }
 
@@ -113,18 +113,18 @@ export class BoardGateway
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('board:join')
+  @SubscribeMessage("board:join")
   async handleJoin(
     @MessageBody() body: { boardId: number },
     @ConnectedSocket() client: WsSocket,
   ) {
     if (!this.isValidId(body?.boardId)) {
-      return { ok: false, error: 'boardId must be a positive integer' };
+      return { ok: false, error: "boardId must be a positive integer" };
     }
 
     const userId = client.data.userId;
     if (!this.isValidId(userId)) {
-      return { ok: false, error: 'Socket is not authenticated' };
+      return { ok: false, error: "Socket is not authenticated" };
     }
 
     const board = await this.prismaService.board.findFirst({
@@ -146,38 +146,38 @@ export class BoardGateway
     });
 
     if (!board) {
-      return { ok: false, error: 'Board not found or access denied' };
+      return { ok: false, error: "Board not found or access denied" };
     }
 
     await client.join(`board:${body.boardId}`);
     return { ok: true, room: `board:${body.boardId}` };
   }
 
-  @SubscribeMessage('board:leave')
+  @SubscribeMessage("board:leave")
   async handleLeave(
     @MessageBody() body: { boardId: number },
     @ConnectedSocket() client: WsSocket,
   ) {
     if (!this.isValidId(body?.boardId)) {
-      return { ok: false, error: 'boardId must be a positive integer' };
+      return { ok: false, error: "boardId must be a positive integer" };
     }
 
     await client.leave(`board:${body.boardId}`);
     return { ok: true, room: `board:${body.boardId}` };
   }
 
-  @SubscribeMessage('card:join')
+  @SubscribeMessage("card:join")
   async handleCardJoin(
     @MessageBody() body: { cardId: number },
     @ConnectedSocket() client: WsSocket,
   ) {
     if (!this.isValidId(body?.cardId)) {
-      return { ok: false, error: 'cardId must be a positive integer' };
+      return { ok: false, error: "cardId must be a positive integer" };
     }
 
     const userId = client.data.userId;
     if (!this.isValidId(userId)) {
-      return { ok: false, error: 'Socket is not authenticated' };
+      return { ok: false, error: "Socket is not authenticated" };
     }
 
     const card = await this.prismaService.card.findFirst({
@@ -202,44 +202,44 @@ export class BoardGateway
     });
 
     if (!card) {
-      return { ok: false, error: 'Card not found or access denied' };
+      return { ok: false, error: "Card not found or access denied" };
     }
 
     await client.join(`card:${body.cardId}`);
     return { ok: true, room: `card:${body.cardId}` };
   }
 
-  @SubscribeMessage('card:leave')
+  @SubscribeMessage("card:leave")
   async handleCardLeave(
     @MessageBody() body: { cardId: number },
     @ConnectedSocket() client: WsSocket,
   ) {
     if (!this.isValidId(body?.cardId)) {
-      return { ok: false, error: 'cardId must be a positive integer' };
+      return { ok: false, error: "cardId must be a positive integer" };
     }
 
     await client.leave(`card:${body.cardId}`);
     return { ok: true, room: `card:${body.cardId}` };
   }
 
-  @SubscribeMessage('user:join')
+  @SubscribeMessage("user:join")
   handleUserJoin(@ConnectedSocket() client: WsSocket) {
     const userId = client.data.userId;
     if (!this.isValidId(userId)) {
-      return { ok: false, error: 'Socket is not authenticated' };
+      return { ok: false, error: "Socket is not authenticated" };
     }
 
     return { ok: true, room: `user:${userId}` };
   }
 
-  @SubscribeMessage('user:leave')
+  @SubscribeMessage("user:leave")
   async handleUserLeave(
     @MessageBody() body: { userId?: number },
     @ConnectedSocket() client: WsSocket,
   ) {
     const userId = client.data.userId;
     if (!this.isValidId(userId)) {
-      return { ok: false, error: 'Socket is not authenticated' };
+      return { ok: false, error: "Socket is not authenticated" };
     }
 
     const requestedUserId = body?.userId;
@@ -248,7 +248,7 @@ export class BoardGateway
       this.isValidId(requestedUserId) &&
       requestedUserId !== userId
     ) {
-      return { ok: false, error: 'Cannot leave another user room' };
+      return { ok: false, error: "Cannot leave another user room" };
     }
 
     await client.leave(`user:${userId}`);

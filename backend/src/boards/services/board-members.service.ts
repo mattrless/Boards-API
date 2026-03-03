@@ -1,4 +1,4 @@
-import { BoardsService } from './boards.service';
+import { BoardsService } from "./boards.service";
 import {
   ConflictException,
   ForbiddenException,
@@ -6,16 +6,16 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-} from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
-import { Prisma } from 'generated/prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { ActionResponseDto } from 'src/users/dto/action-response.dto';
-import { AddMemberDto } from '../dto/add-member.dto';
-import { UsersService } from 'src/users/users.service';
-import { UpdateBoardMemberRoleDto } from '../dto/update-board-member-role.dto';
-import { BoardMemberResponseDto } from '../dto/board-members-response.dto';
-import { BoardEventsService } from 'src/websocket/services/boards-events.service';
+} from "@nestjs/common";
+import { plainToInstance } from "class-transformer";
+import { Prisma } from "generated/prisma/client";
+import { PrismaService } from "src/prisma/prisma.service";
+import { ActionResponseDto } from "src/users/dto/action-response.dto";
+import { AddMemberDto } from "../dto/add-member.dto";
+import { UsersService } from "src/users/users.service";
+import { UpdateBoardMemberRoleDto } from "../dto/update-board-member-role.dto";
+import { BoardMemberResponseDto } from "../dto/board-members-response.dto";
+import { BoardEventsService } from "src/websocket/services/boards-events.service";
 
 @Injectable()
 export class BoardMembersService {
@@ -34,10 +34,10 @@ export class BoardMembersService {
       const user = await this.usersService.getUserByEmail(addMemberDto.email);
 
       if (!user) {
-        throw new NotFoundException('User not found.');
+        throw new NotFoundException("User not found.");
       }
 
-      const memberRoleId = await this.boardsService.getBoardRoleId('member');
+      const memberRoleId = await this.boardsService.getBoardRoleId("member");
 
       await this.prismaService.userBoard.create({
         data: {
@@ -50,18 +50,18 @@ export class BoardMembersService {
       this.boardEventsService.emitBoardMemberAdded(boardId, {
         boardId,
         targetUserId: user.id,
-        role: 'member',
+        role: "member",
         timestamp: new Date().toISOString(),
       });
       this.boardEventsService.emitUserBoardsChanged(user.id, {
         boardId,
-        reason: 'board:memberAdded',
+        reason: "board:memberAdded",
         timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(
         ActionResponseDto,
-        { message: 'Member added successfully' },
+        { message: "Member added successfully" },
         {
           excludeExtraneousValues: true,
         },
@@ -73,12 +73,12 @@ export class BoardMembersService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
+        error.code === "P2002"
       ) {
-        throw new ConflictException('User is already a member of this board.');
+        throw new ConflictException("User is already a member of this board.");
       }
 
-      throw new InternalServerErrorException('Failed to add member.');
+      throw new InternalServerErrorException("Failed to add member.");
     }
   }
 
@@ -114,11 +114,11 @@ export class BoardMembersService {
       );
 
       if (!currentMembership) {
-        throw new ForbiddenException('Current user is not a board member.');
+        throw new ForbiddenException("Current user is not a board member.");
       }
 
       if (!targetMembership) {
-        throw new NotFoundException('Member not found in this board.');
+        throw new NotFoundException("Member not found in this board.");
       }
 
       const currentUserIsOwner = board.ownerId === currentUserId;
@@ -126,7 +126,7 @@ export class BoardMembersService {
 
       if (currentUserIsOwner && targetUserIsOwner) {
         throw new ConflictException(
-          'Owner cannot remove himself from the board.',
+          "Owner cannot remove himself from the board.",
         );
       }
 
@@ -134,22 +134,22 @@ export class BoardMembersService {
         const currentRole = currentMembership.boardRole.name;
         const targetRole = targetMembership.boardRole.name;
 
-        if (currentRole !== 'admin') {
+        if (currentRole !== "admin") {
           throw new ForbiddenException(
-            'Only owner or admin can remove board members.',
+            "Only owner or admin can remove board members.",
           );
         }
 
         if (targetUserIsOwner) {
-          throw new ConflictException('Admin cannot remove the board owner.');
+          throw new ConflictException("Admin cannot remove the board owner.");
         }
 
-        if (targetRole === 'admin') {
-          throw new ConflictException('Admin cannot remove another admin.');
+        if (targetRole === "admin") {
+          throw new ConflictException("Admin cannot remove another admin.");
         }
 
-        if (targetRole !== 'member') {
-          throw new ConflictException('Admin can only remove members.');
+        if (targetRole !== "member") {
+          throw new ConflictException("Admin can only remove members.");
         }
       }
 
@@ -170,13 +170,13 @@ export class BoardMembersService {
       });
       this.boardEventsService.emitUserBoardsChanged(targetUserId, {
         boardId,
-        reason: 'board:memberRemoved',
+        reason: "board:memberRemoved",
         timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(
         ActionResponseDto,
-        { message: 'Member removed successfully' },
+        { message: "Member removed successfully" },
         {
           excludeExtraneousValues: true,
         },
@@ -188,12 +188,12 @@ export class BoardMembersService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
+        error.code === "P2025"
       ) {
-        throw new NotFoundException('Member not found in this board.');
+        throw new NotFoundException("Member not found in this board.");
       }
 
-      throw new InternalServerErrorException('Failed to remove member.');
+      throw new InternalServerErrorException("Failed to remove member.");
     }
   }
 
@@ -233,11 +233,11 @@ export class BoardMembersService {
       );
 
       if (!currentMembership) {
-        throw new ForbiddenException('Current user is not a board member.');
+        throw new ForbiddenException("Current user is not a board member.");
       }
 
       if (!targetMembership) {
-        throw new NotFoundException('Member not found in this board.');
+        throw new NotFoundException("Member not found in this board.");
       }
 
       const currentUserIsOwner = board.ownerId === currentUserId;
@@ -248,34 +248,34 @@ export class BoardMembersService {
 
       if (currentUserIsOwner && targetUserIsOwner) {
         throw new ConflictException(
-          'Owner cannot update his own role through this endpoint.',
+          "Owner cannot update his own role through this endpoint.",
         );
       }
 
       if (targetUserIsOwner) {
-        throw new ConflictException('Board owner role cannot be changed.');
+        throw new ConflictException("Board owner role cannot be changed.");
       }
 
       if (targetRole === desiredRole) {
-        throw new ConflictException('Member already has the requested role.');
+        throw new ConflictException("Member already has the requested role.");
       }
 
       if (!currentUserIsOwner) {
-        if (currentRole !== 'admin') {
+        if (currentRole !== "admin") {
           throw new ForbiddenException(
-            'Only owner or admin can update board member roles.',
+            "Only owner or admin can update board member roles.",
           );
         }
 
-        if (targetRole === 'admin') {
+        if (targetRole === "admin") {
           throw new ConflictException(
-            'Admin cannot change another admin role.',
+            "Admin cannot change another admin role.",
           );
         }
 
-        if (targetRole !== 'member' || desiredRole !== 'admin') {
+        if (targetRole !== "member" || desiredRole !== "admin") {
           throw new ConflictException(
-            'Admin can only promote members to admin.',
+            "Admin can only promote members to admin.",
           );
         }
       }
@@ -301,13 +301,13 @@ export class BoardMembersService {
       });
       this.boardEventsService.emitUserBoardsChanged(targetUserId, {
         boardId,
-        reason: 'board:memberRoleUpdated',
+        reason: "board:memberRoleUpdated",
         timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(
         ActionResponseDto,
-        { message: 'Member role updated successfully' },
+        { message: "Member role updated successfully" },
         {
           excludeExtraneousValues: true,
         },
@@ -319,12 +319,12 @@ export class BoardMembersService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
+        error.code === "P2025"
       ) {
-        throw new NotFoundException('Member not found in this board.');
+        throw new NotFoundException("Member not found in this board.");
       }
 
-      throw new InternalServerErrorException('Failed to update member role.');
+      throw new InternalServerErrorException("Failed to update member role.");
     }
   }
 
@@ -377,7 +377,7 @@ export class BoardMembersService {
         throw error;
       }
 
-      throw new InternalServerErrorException('Failed to fetch board members.');
+      throw new InternalServerErrorException("Failed to fetch board members.");
     }
   }
 }

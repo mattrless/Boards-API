@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { BoardGateway } from '../gateways/board.gateway';
+import { Injectable } from "@nestjs/common";
+import { BoardGateway } from "../gateways/board.gateway";
 
 @Injectable()
 export class CardsEventsService {
@@ -22,7 +22,7 @@ export class CardsEventsService {
   }
 
   emitCardCreated(boardId: number, payload: Record<string, unknown>) {
-    this.emitToBoard(boardId, 'card:created', payload);
+    this.emitToBoard(boardId, "card:created", payload);
   }
 
   emitCardUpdated(
@@ -30,8 +30,8 @@ export class CardsEventsService {
     cardId: number,
     payload: Record<string, unknown>,
   ) {
-    this.emitToBoard(boardId, 'card:updated', payload);
-    this.emitToCard(cardId, 'card:updated', payload);
+    this.emitToBoard(boardId, "card:updated", payload);
+    this.emitToCard(cardId, "card:updated", payload);
   }
 
   emitCardMoved(
@@ -39,8 +39,8 @@ export class CardsEventsService {
     cardId: number,
     payload: Record<string, unknown>,
   ) {
-    this.emitToBoard(boardId, 'card:moved', payload);
-    this.emitToCard(cardId, 'card:moved', payload);
+    this.emitToBoard(boardId, "card:moved", payload);
+    this.emitToCard(cardId, "card:moved", payload);
   }
 
   emitCardDeleted(
@@ -48,8 +48,8 @@ export class CardsEventsService {
     cardId: number,
     payload: Record<string, unknown>,
   ) {
-    this.emitToBoard(boardId, 'card:deleted', payload);
-    this.emitToCard(cardId, 'card:deleted', payload);
+    this.emitToBoard(boardId, "card:deleted", payload);
+    this.emitToCard(cardId, "card:deleted", payload);
   }
 
   emitCardMemberAdded(
@@ -57,8 +57,8 @@ export class CardsEventsService {
     cardId: number,
     payload: Record<string, unknown>,
   ) {
-    this.emitToBoard(boardId, 'card:memberAdded', payload);
-    this.emitToCard(cardId, 'card:memberAdded', payload);
+    this.emitToBoard(boardId, "card:memberAdded", payload);
+    this.emitToCard(cardId, "card:memberAdded", payload);
   }
 
   emitCardMemberRemoved(
@@ -66,7 +66,7 @@ export class CardsEventsService {
     cardId: number,
     payload: Record<string, unknown>,
   ) {
-    this.emitToBoard(boardId, 'card:memberRemoved', payload);
-    this.emitToCard(cardId, 'card:memberRemoved', payload);
+    this.emitToBoard(boardId, "card:memberRemoved", payload);
+    this.emitToCard(cardId, "card:memberRemoved", payload);
   }
 }

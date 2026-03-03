@@ -4,17 +4,17 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-} from '@nestjs/common';
-import { CreateCardDto } from '../dto/create-card.dto';
-import { UpdateCardDto } from '../dto/update-card.dto';
-import { UpdateCardPositionDto } from '../dto/update-card-position.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { plainToInstance } from 'class-transformer';
-import { CardResponseDto } from '../dto/card-response.dto';
-import { CardSummaryResponseDto } from '../dto/card-summary-response.dto';
-import { Card, Prisma } from 'generated/prisma/client';
-import { ActionResponseDto } from 'src/users/dto/action-response.dto';
-import { CardsEventsService } from 'src/websocket/services/cards-events.service';
+} from "@nestjs/common";
+import { CreateCardDto } from "../dto/create-card.dto";
+import { UpdateCardDto } from "../dto/update-card.dto";
+import { UpdateCardPositionDto } from "../dto/update-card-position.dto";
+import { PrismaService } from "src/prisma/prisma.service";
+import { plainToInstance } from "class-transformer";
+import { CardResponseDto } from "../dto/card-response.dto";
+import { CardSummaryResponseDto } from "../dto/card-summary-response.dto";
+import { Card, Prisma } from "generated/prisma/client";
+import { ActionResponseDto } from "src/users/dto/action-response.dto";
+import { CardsEventsService } from "src/websocket/services/cards-events.service";
 
 @Injectable()
 export class CardsService {
@@ -30,7 +30,7 @@ export class CardsService {
 
         const lastCard = await tx.card.findFirst({
           where: { listId },
-          orderBy: { position: 'desc' },
+          orderBy: { position: "desc" },
           select: { position: true },
         });
 
@@ -83,12 +83,12 @@ export class CardsService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2003'
+        error.code === "P2003"
       ) {
-        throw new NotFoundException('List not found');
+        throw new NotFoundException("List not found");
       }
 
-      throw new InternalServerErrorException('Failed to create card.');
+      throw new InternalServerErrorException("Failed to create card.");
     }
   }
 
@@ -99,7 +99,7 @@ export class CardsService {
           listId: listId,
         },
         orderBy: {
-          position: 'asc',
+          position: "asc",
         },
       });
 
@@ -111,7 +111,7 @@ export class CardsService {
         throw error;
       }
 
-      throw new InternalServerErrorException('Failed to fetch cards.');
+      throw new InternalServerErrorException("Failed to fetch cards.");
     }
   }
 
@@ -135,7 +135,7 @@ export class CardsService {
       });
 
       if (!card) {
-        throw new NotFoundException('Card not found');
+        throw new NotFoundException("Card not found");
       }
 
       return plainToInstance(CardResponseDto, card, {
@@ -146,7 +146,7 @@ export class CardsService {
         throw error;
       }
 
-      throw new InternalServerErrorException('Failed to fetch card.');
+      throw new InternalServerErrorException("Failed to fetch card.");
     }
   }
 
@@ -162,7 +162,7 @@ export class CardsService {
       });
 
       if (!list) {
-        throw new NotFoundException('List not found');
+        throw new NotFoundException("List not found");
       }
 
       const data: Prisma.CardUpdateInput = {
@@ -211,12 +211,12 @@ export class CardsService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
+        error.code === "P2025"
       ) {
-        throw new NotFoundException('Card not found');
+        throw new NotFoundException("Card not found");
       }
 
-      throw new InternalServerErrorException('Failed to update card');
+      throw new InternalServerErrorException("Failed to update card");
     }
   }
 
@@ -229,7 +229,7 @@ export class CardsService {
 
     if (prevCardId === cardId || nextCardId === cardId) {
       throw new BadRequestException(
-        'Cannot position a card relative to itself',
+        "Cannot position a card relative to itself",
       );
     }
 
@@ -239,7 +239,7 @@ export class CardsService {
       prevCardId === nextCardId
     ) {
       throw new BadRequestException(
-        'prevCardId and nextCardId must be different',
+        "prevCardId and nextCardId must be different",
       );
     }
 
@@ -261,7 +261,7 @@ export class CardsService {
         });
 
         if (!movingCard) {
-          throw new NotFoundException('Card not found in this board');
+          throw new NotFoundException("Card not found in this board");
         }
 
         const destinationListId = targetListId ?? movingCard.listId;
@@ -277,7 +277,7 @@ export class CardsService {
         });
 
         if (!destinationList) {
-          throw new NotFoundException('Target list not found in this board');
+          throw new NotFoundException("Target list not found in this board");
         }
 
         const destinationCardsCount = await tx.card.count({
@@ -300,7 +300,7 @@ export class CardsService {
             },
           });
           if (!prevCard) {
-            throw new NotFoundException('prev card not found in target list');
+            throw new NotFoundException("prev card not found in target list");
           }
         }
 
@@ -312,7 +312,7 @@ export class CardsService {
             },
           });
           if (!nextCard) {
-            throw new NotFoundException('next card not found in target list');
+            throw new NotFoundException("next card not found in target list");
           }
         }
 
@@ -322,7 +322,7 @@ export class CardsService {
               listId: destinationListId,
             },
             orderBy: {
-              position: 'desc',
+              position: "desc",
             },
             select: {
               id: true,
@@ -331,7 +331,7 @@ export class CardsService {
 
           if (!lastCard || lastCard.id !== prevCard.id) {
             throw new BadRequestException(
-              'To move a card to the middle, provide both prevCardId and nextCardId',
+              "To move a card to the middle, provide both prevCardId and nextCardId",
             );
           }
         }
@@ -342,7 +342,7 @@ export class CardsService {
               listId: destinationListId,
             },
             orderBy: {
-              position: 'asc',
+              position: "asc",
             },
             select: {
               id: true,
@@ -351,7 +351,7 @@ export class CardsService {
 
           if (!firstCard || firstCard.id !== nextCard.id) {
             throw new BadRequestException(
-              'To move a card to the middle, provide both prevCardId and nextCardId',
+              "To move a card to the middle, provide both prevCardId and nextCardId",
             );
           }
         }
@@ -363,7 +363,7 @@ export class CardsService {
             newPosition = 1000;
           } else {
             throw new BadRequestException(
-              'prevCardId or nextCardId is required to move a card',
+              "prevCardId or nextCardId is required to move a card",
             );
           }
         } else if (prevCard && nextCard) {
@@ -383,14 +383,14 @@ export class CardsService {
 
             if (cardsBetween > 0) {
               throw new BadRequestException(
-                'prevCardId and nextCardId must be adjacent cards',
+                "prevCardId and nextCardId must be adjacent cards",
               );
             }
 
             newPosition = (prevCard.position + nextCard.position) / 2;
           } else {
             throw new BadRequestException(
-              'Invalid target order: prevCard must be before nextCard',
+              "Invalid target order: prevCard must be before nextCard",
             );
           }
         } else if (prevCard) {
@@ -399,7 +399,7 @@ export class CardsService {
           newPosition = nextCard.position - 1000;
         } else {
           throw new BadRequestException(
-            'Invalid position payload. Provide prevCardId, nextCardId, or both.',
+            "Invalid position payload. Provide prevCardId, nextCardId, or both.",
           );
         }
 
@@ -448,14 +448,14 @@ export class CardsService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
+        error.code === "P2002"
       ) {
         throw new BadRequestException(
-          'Position conflict. Please retry the move operation.',
+          "Position conflict. Please retry the move operation.",
         );
       }
 
-      throw new InternalServerErrorException('Failed to update card position');
+      throw new InternalServerErrorException("Failed to update card position");
     }
   }
 
@@ -471,7 +471,7 @@ export class CardsService {
       });
 
       if (!list) {
-        throw new NotFoundException('List not found');
+        throw new NotFoundException("List not found");
       }
 
       const deleted = await this.prismaService.card.deleteMany({
@@ -482,7 +482,7 @@ export class CardsService {
       });
 
       if (deleted.count === 0) {
-        throw new NotFoundException('Card not found');
+        throw new NotFoundException("Card not found");
       }
 
       this.cardsEventsService.emitCardDeleted(list.boardId, cardId, {
@@ -494,7 +494,7 @@ export class CardsService {
 
       return plainToInstance(
         ActionResponseDto,
-        { message: 'Card deleted successfully' },
+        { message: "Card deleted successfully" },
         {
           excludeExtraneousValues: true,
         },
@@ -504,7 +504,7 @@ export class CardsService {
         throw error;
       }
 
-      throw new InternalServerErrorException('Failed to delete card');
+      throw new InternalServerErrorException("Failed to delete card");
     }
   }
 }

@@ -4,9 +4,9 @@ import {
   ExecutionContext,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import type { Request } from 'express';
-import { PrismaService } from 'src/prisma/prisma.service';
+} from "@nestjs/common";
+import type { Request } from "express";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class CardBelongsToBoardGuard implements CanActivate {
@@ -19,11 +19,11 @@ export class CardBelongsToBoardGuard implements CanActivate {
     const cardId = Number(request.params.cardId);
 
     if (!Number.isInteger(boardId)) {
-      throw new BadRequestException('Invalid board id');
+      throw new BadRequestException("Invalid board id");
     }
 
     if (!Number.isInteger(cardId)) {
-      throw new BadRequestException('Invalid card id');
+      throw new BadRequestException("Invalid card id");
     }
 
     const card = await this.prismaService.card.findFirst({
@@ -37,7 +37,7 @@ export class CardBelongsToBoardGuard implements CanActivate {
     });
 
     if (!card) {
-      throw new NotFoundException('Card not found in this board');
+      throw new NotFoundException("Card not found in this board");
     }
 
     return true;

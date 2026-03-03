@@ -4,17 +4,17 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-} from '@nestjs/common';
-import { CreateListDto } from './dto/create-list.dto';
-import { UpdateListDto } from './dto/update-list.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { plainToInstance } from 'class-transformer';
-import { ListResponseDto } from './dto/list-response.dto';
-import { ListSummaryResponseDto } from './dto/list-summary-response.dto';
-import { List, Prisma } from 'generated/prisma/client';
-import { ActionResponseDto } from 'src/users/dto/action-response.dto';
-import { UpdateListPositionDto } from './dto/update-list-position.dto';
-import { ListsEventsService } from 'src/websocket/services/lists-events.service';
+} from "@nestjs/common";
+import { CreateListDto } from "./dto/create-list.dto";
+import { UpdateListDto } from "./dto/update-list.dto";
+import { PrismaService } from "src/prisma/prisma.service";
+import { plainToInstance } from "class-transformer";
+import { ListResponseDto } from "./dto/list-response.dto";
+import { ListSummaryResponseDto } from "./dto/list-summary-response.dto";
+import { List, Prisma } from "generated/prisma/client";
+import { ActionResponseDto } from "src/users/dto/action-response.dto";
+import { UpdateListPositionDto } from "./dto/update-list-position.dto";
+import { ListsEventsService } from "src/websocket/services/lists-events.service";
 
 @Injectable()
 export class ListsService {
@@ -30,7 +30,7 @@ export class ListsService {
 
         const lastList = await tx.list.findFirst({
           where: { boardId },
-          orderBy: { position: 'desc' },
+          orderBy: { position: "desc" },
           select: { position: true },
         });
 
@@ -80,12 +80,12 @@ export class ListsService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2003'
+        error.code === "P2003"
       ) {
-        throw new NotFoundException('Board not found');
+        throw new NotFoundException("Board not found");
       }
 
-      throw new InternalServerErrorException('Failed to create list.');
+      throw new InternalServerErrorException("Failed to create list.");
     }
   }
 
@@ -96,7 +96,7 @@ export class ListsService {
           boardId: boardId,
         },
         orderBy: {
-          position: 'asc',
+          position: "asc",
         },
       });
 
@@ -108,7 +108,7 @@ export class ListsService {
         throw error;
       }
 
-      throw new InternalServerErrorException('Failed to fetch lists.');
+      throw new InternalServerErrorException("Failed to fetch lists.");
     }
   }
 
@@ -131,7 +131,7 @@ export class ListsService {
       });
 
       if (!list) {
-        throw new NotFoundException('List not found');
+        throw new NotFoundException("List not found");
       }
 
       return plainToInstance(ListResponseDto, list, {
@@ -142,7 +142,7 @@ export class ListsService {
         throw error;
       }
 
-      throw new InternalServerErrorException('Failed to fetch list.');
+      throw new InternalServerErrorException("Failed to fetch list.");
     }
   }
 
@@ -188,12 +188,12 @@ export class ListsService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
+        error.code === "P2025"
       ) {
-        throw new NotFoundException('List not found');
+        throw new NotFoundException("List not found");
       }
 
-      throw new InternalServerErrorException('Failed to update list');
+      throw new InternalServerErrorException("Failed to update list");
     }
   }
 
@@ -210,7 +210,7 @@ export class ListsService {
       });
 
       if (!existingList) {
-        throw new NotFoundException('List not found');
+        throw new NotFoundException("List not found");
       }
 
       await this.prismaService.list.delete({
@@ -227,7 +227,7 @@ export class ListsService {
 
       return plainToInstance(
         ActionResponseDto,
-        { message: 'List deleted successfully' },
+        { message: "List deleted successfully" },
         {
           excludeExtraneousValues: true,
         },
@@ -239,12 +239,12 @@ export class ListsService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
+        error.code === "P2025"
       ) {
-        throw new NotFoundException('List not found');
+        throw new NotFoundException("List not found");
       }
 
-      throw new InternalServerErrorException('Failed to delete list');
+      throw new InternalServerErrorException("Failed to delete list");
     }
   }
 
@@ -257,13 +257,13 @@ export class ListsService {
 
     if (prevListId === undefined && nextListId === undefined) {
       throw new BadRequestException(
-        'prevListId or nextListId is required to move a list',
+        "prevListId or nextListId is required to move a list",
       );
     }
 
     if (prevListId === listId || nextListId === listId) {
       throw new BadRequestException(
-        'Cannot position a list relative to itself',
+        "Cannot position a list relative to itself",
       );
     }
 
@@ -273,7 +273,7 @@ export class ListsService {
       prevListId === nextListId
     ) {
       throw new BadRequestException(
-        'prevListId and nextListId must be different',
+        "prevListId and nextListId must be different",
       );
     }
 
@@ -292,7 +292,7 @@ export class ListsService {
             },
           });
           if (!prevList) {
-            throw new NotFoundException('prev list not found in this board');
+            throw new NotFoundException("prev list not found in this board");
           }
         }
 
@@ -304,7 +304,7 @@ export class ListsService {
             },
           });
           if (!nextList) {
-            throw new NotFoundException('next list not found in this board');
+            throw new NotFoundException("next list not found in this board");
           }
         }
 
@@ -314,7 +314,7 @@ export class ListsService {
               boardId,
             },
             orderBy: {
-              position: 'desc',
+              position: "desc",
             },
             select: {
               id: true,
@@ -323,7 +323,7 @@ export class ListsService {
 
           if (!lastList || lastList.id !== prevList.id) {
             throw new BadRequestException(
-              'To move a list to the middle, provide both prevListId and nextListId',
+              "To move a list to the middle, provide both prevListId and nextListId",
             );
           }
         }
@@ -334,7 +334,7 @@ export class ListsService {
               boardId,
             },
             orderBy: {
-              position: 'asc',
+              position: "asc",
             },
             select: {
               id: true,
@@ -343,7 +343,7 @@ export class ListsService {
 
           if (!firstList || firstList.id !== nextList.id) {
             throw new BadRequestException(
-              'To move a list to the middle, provide both prevListId and nextListId',
+              "To move a list to the middle, provide both prevListId and nextListId",
             );
           }
         }
@@ -355,7 +355,7 @@ export class ListsService {
             newPosition = (prevList.position + nextList.position) / 2;
           } else {
             throw new BadRequestException(
-              'Invalid target order: prevList must be before nextList',
+              "Invalid target order: prevList must be before nextList",
             );
           }
         } else if (prevList) {
@@ -364,7 +364,7 @@ export class ListsService {
           newPosition = nextList.position - 1000;
         } else {
           throw new BadRequestException(
-            'prevListId or nextListId is required to move a list',
+            "prevListId or nextListId is required to move a list",
           );
         }
 
@@ -406,14 +406,14 @@ export class ListsService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
+        error.code === "P2002"
       ) {
         throw new BadRequestException(
-          'Position conflict. Please retry the move operation.',
+          "Position conflict. Please retry the move operation.",
         );
       }
 
-      throw new InternalServerErrorException('Failed to update list position');
+      throw new InternalServerErrorException("Failed to update list position");
     }
   }
 }

@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { BoardGateway } from '../gateways/board.gateway';
+import { Injectable, Logger } from "@nestjs/common";
+import { BoardGateway } from "../gateways/board.gateway";
 
 @Injectable()
 export class BoardEventsService {
@@ -27,44 +27,44 @@ export class BoardEventsService {
   }
 
   emitBoardCreated(boardId: number, payload: Record<string, unknown>) {
-    this.emitToBoard(boardId, 'board:created', payload);
+    this.emitToBoard(boardId, "board:created", payload);
   }
 
   emitBoardUpdated(boardId: number, payload: Record<string, unknown>) {
-    this.emitToBoard(boardId, 'board:updated', payload);
+    this.emitToBoard(boardId, "board:updated", payload);
   }
 
   emitBoardDeleted(boardId: number, payload: Record<string, unknown>) {
-    this.emitToBoard(boardId, 'board:deleted', payload);
+    this.emitToBoard(boardId, "board:deleted", payload);
   }
 
   emitBoardRestored(boardId: number, payload: Record<string, unknown>) {
-    this.emitToBoard(boardId, 'board:restored', payload);
+    this.emitToBoard(boardId, "board:restored", payload);
   }
 
   emitBoardOwnershipTransferred(
     boardId: number,
     payload: Record<string, unknown>,
   ) {
-    this.emitToBoard(boardId, 'board:ownershipTransferred', payload);
+    this.emitToBoard(boardId, "board:ownershipTransferred", payload);
   }
 
   emitBoardMemberAdded(boardId: number, payload: Record<string, unknown>) {
-    this.emitToBoard(boardId, 'board:memberAdded', payload);
+    this.emitToBoard(boardId, "board:memberAdded", payload);
   }
 
   emitBoardMemberRemoved(boardId: number, payload: Record<string, unknown>) {
-    this.emitToBoard(boardId, 'board:memberRemoved', payload);
+    this.emitToBoard(boardId, "board:memberRemoved", payload);
   }
 
   emitBoardMemberRoleUpdated(
     boardId: number,
     payload: Record<string, unknown>,
   ) {
-    this.emitToBoard(boardId, 'board:memberRoleUpdated', payload);
+    this.emitToBoard(boardId, "board:memberRoleUpdated", payload);
   }
 
   emitUserBoardsChanged(userId: number, payload: Record<string, unknown>) {
-    this.emitToUser(userId, 'boards:changed', payload);
+    this.emitToUser(userId, "boards:changed", payload);
   }
 }

@@ -4,18 +4,18 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-} from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { ActionResponseDto } from 'src/users/dto/action-response.dto';
-import { CreateBoardDto } from '../dto/create-board.dto';
-import { BoardResponseDto } from '../dto/board-response.dto';
-import { Prisma } from 'generated/prisma/client';
-import { BoardOwnerResponseDto } from '../dto/board-owner-response.dto';
-import { UpdateBoardDto } from '../dto/update-board.dto';
-import { BoardDetailsResponseDto } from '../dto/board-details-response.dto';
-import { BoardEventsService } from 'src/websocket/services/boards-events.service';
-import { MyBoardResponseDto } from '../dto/my-board-response.dto';
+} from "@nestjs/common";
+import { plainToInstance } from "class-transformer";
+import { PrismaService } from "src/prisma/prisma.service";
+import { ActionResponseDto } from "src/users/dto/action-response.dto";
+import { CreateBoardDto } from "../dto/create-board.dto";
+import { BoardResponseDto } from "../dto/board-response.dto";
+import { Prisma } from "generated/prisma/client";
+import { BoardOwnerResponseDto } from "../dto/board-owner-response.dto";
+import { UpdateBoardDto } from "../dto/update-board.dto";
+import { BoardDetailsResponseDto } from "../dto/board-details-response.dto";
+import { BoardEventsService } from "src/websocket/services/boards-events.service";
+import { MyBoardResponseDto } from "../dto/my-board-response.dto";
 
 @Injectable()
 export class BoardsService {
@@ -26,7 +26,7 @@ export class BoardsService {
 
   async create(ownerId: number, createBoardDto: CreateBoardDto) {
     try {
-      const adminBoardRoleId = await this.getBoardRoleId('admin');
+      const adminBoardRoleId = await this.getBoardRoleId("admin");
 
       const board = await this.prismaService.$transaction(async (tx) => {
         const createdBoard = await tx.board.create({
@@ -65,7 +65,7 @@ export class BoardsService {
       });
       this.boardEventsService.emitUserBoardsChanged(ownerId, {
         boardId: board.id,
-        reason: 'board:created',
+        reason: "board:created",
         timestamp: new Date().toISOString(),
       });
 
@@ -79,11 +79,11 @@ export class BoardsService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2003'
+        error.code === "P2003"
       ) {
-        throw new NotFoundException('Owner not found');
+        throw new NotFoundException("Owner not found");
       }
-      throw new InternalServerErrorException('Failed to create board');
+      throw new InternalServerErrorException("Failed to create board");
     }
   }
 
@@ -102,7 +102,7 @@ export class BoardsService {
         excludeExtraneousValues: true,
       });
     } catch {
-      throw new InternalServerErrorException('Failed to fetch boards');
+      throw new InternalServerErrorException("Failed to fetch boards");
     }
   }
 
@@ -141,7 +141,7 @@ export class BoardsService {
         excludeExtraneousValues: true,
       });
     } catch {
-      throw new InternalServerErrorException('Failed to fetch user boards');
+      throw new InternalServerErrorException("Failed to fetch user boards");
     }
   }
 
@@ -154,10 +154,10 @@ export class BoardsService {
       include: {
         owner: true,
         lists: {
-          orderBy: { position: 'asc' },
+          orderBy: { position: "asc" },
           include: {
             cards: {
-              orderBy: { position: 'asc' },
+              orderBy: { position: "asc" },
               include: {
                 cardAssignments: {
                   where: {
@@ -166,7 +166,7 @@ export class BoardsService {
                     },
                   },
                   orderBy: {
-                    createdAt: 'asc',
+                    createdAt: "asc",
                   },
                   select: {
                     createdAt: true,
@@ -192,7 +192,7 @@ export class BoardsService {
     });
 
     if (!board) {
-      throw new NotFoundException('Board not found');
+      throw new NotFoundException("Board not found");
     }
 
     const boardWithDetails = {
@@ -259,7 +259,7 @@ export class BoardsService {
       for (const member of memberIds) {
         this.boardEventsService.emitUserBoardsChanged(member.userId, {
           boardId: board.id,
-          reason: 'board:updated',
+          reason: "board:updated",
           timestamp: new Date().toISOString(),
         });
       }
@@ -274,11 +274,11 @@ export class BoardsService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
+        error.code === "P2025"
       ) {
-        throw new NotFoundException('Board not found');
+        throw new NotFoundException("Board not found");
       }
-      throw new InternalServerErrorException('Failed to update board');
+      throw new InternalServerErrorException("Failed to update board");
     }
   }
 
@@ -301,7 +301,7 @@ export class BoardsService {
     });
 
     if (result.count === 0) {
-      throw new NotFoundException('Board not found');
+      throw new NotFoundException("Board not found");
     }
 
     this.boardEventsService.emitBoardDeleted(id, {
@@ -312,14 +312,14 @@ export class BoardsService {
     for (const member of memberIds) {
       this.boardEventsService.emitUserBoardsChanged(member.userId, {
         boardId: id,
-        reason: 'board:deleted',
+        reason: "board:deleted",
         timestamp: new Date().toISOString(),
       });
     }
 
     return plainToInstance(
       ActionResponseDto,
-      { message: 'Board deleted successfully' },
+      { message: "Board deleted successfully" },
       {
         excludeExtraneousValues: true,
       },
@@ -348,7 +348,7 @@ export class BoardsService {
     });
 
     if (result.count === 0) {
-      throw new NotFoundException('Board not found or not deleted');
+      throw new NotFoundException("Board not found or not deleted");
     }
 
     this.boardEventsService.emitBoardRestored(id, {
@@ -359,14 +359,14 @@ export class BoardsService {
     for (const member of memberIds) {
       this.boardEventsService.emitUserBoardsChanged(member.userId, {
         boardId: id,
-        reason: 'board:restored',
+        reason: "board:restored",
         timestamp: new Date().toISOString(),
       });
     }
 
     return plainToInstance(
       ActionResponseDto,
-      { message: 'Board restored successfully' },
+      { message: "Board restored successfully" },
       {
         excludeExtraneousValues: true,
       },
@@ -378,18 +378,18 @@ export class BoardsService {
       const board = await this.getBoardById(boardId);
 
       if (board.ownerId === targetUserId) {
-        throw new ConflictException('Target user is already the owner');
+        throw new ConflictException("Target user is already the owner");
       }
 
       await this.prismaService.$transaction(async (tx) => {
         const boardAdminRole = await tx.boardRole.findFirst({
-          where: { name: 'admin' },
+          where: { name: "admin" },
           select: { id: true },
         });
 
         if (!boardAdminRole) {
           throw new InternalServerErrorException(
-            'Board role is not configured in database',
+            "Board role is not configured in database",
           );
         }
 
@@ -412,13 +412,13 @@ export class BoardsService {
 
         if (!targetUserBoardRole) {
           throw new NotFoundException(
-            'Target user not found or is not in board.',
+            "Target user not found or is not in board.",
           );
         }
 
         const targetUserBoardRoleName = targetUserBoardRole.boardRole.name;
 
-        if (targetUserBoardRoleName === 'member') {
+        if (targetUserBoardRoleName === "member") {
           await tx.userBoard.update({
             where: {
               boardId_userId: {
@@ -430,7 +430,7 @@ export class BoardsService {
               boardRoleId: boardAdminRole.id,
             },
           });
-        } else if (targetUserBoardRoleName !== 'admin') {
+        } else if (targetUserBoardRoleName !== "admin") {
           throw new ConflictException(
             `Cannot transfer ownership to board role "${targetUserBoardRoleName}".`,
           );
@@ -459,18 +459,18 @@ export class BoardsService {
       });
       this.boardEventsService.emitUserBoardsChanged(board.ownerId, {
         boardId,
-        reason: 'board:ownershipTransferred',
+        reason: "board:ownershipTransferred",
         timestamp: new Date().toISOString(),
       });
       this.boardEventsService.emitUserBoardsChanged(targetUserId, {
         boardId,
-        reason: 'board:ownershipTransferred',
+        reason: "board:ownershipTransferred",
         timestamp: new Date().toISOString(),
       });
 
       return plainToInstance(
         ActionResponseDto,
-        { message: 'Board ownership transferred' },
+        { message: "Board ownership transferred" },
         {
           excludeExtraneousValues: true,
         },
@@ -481,7 +481,7 @@ export class BoardsService {
       }
 
       throw new InternalServerErrorException(
-        'Failed to transfer board ownership.',
+        "Failed to transfer board ownership.",
       );
     }
   }
@@ -494,7 +494,7 @@ export class BoardsService {
 
     if (!boardRole) {
       throw new InternalServerErrorException(
-        'Board role is not configured in database',
+        "Board role is not configured in database",
       );
     }
 
@@ -513,7 +513,7 @@ export class BoardsService {
     });
 
     if (!board) {
-      throw new NotFoundException('Board not found');
+      throw new NotFoundException("Board not found");
     }
 
     return board;

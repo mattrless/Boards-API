@@ -3,12 +3,12 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
-import { AuthUser } from '../types/auth-user.type';
-import type { Request } from 'express';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { PrismaService } from "src/prisma/prisma.service";
+import { PERMISSIONS_KEY } from "../decorators/permissions.decorator";
+import { AuthUser } from "../types/auth-user.type";
+import type { Request } from "express";
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -34,7 +34,7 @@ export class PermissionsGuard implements CanActivate {
     const user = request.user;
 
     if (!user?.systemRole?.id) {
-      throw new ForbiddenException('User not authenticated');
+      throw new ForbiddenException("User not authenticated");
     }
 
     // get permissions by rol of current user
@@ -52,7 +52,7 @@ export class PermissionsGuard implements CanActivate {
     });
 
     if (!role) {
-      throw new ForbiddenException('Role not found');
+      throw new ForbiddenException("Role not found");
     }
 
     const userPermissions = role.systemRoleSystemPermissions.map(
@@ -64,7 +64,7 @@ export class PermissionsGuard implements CanActivate {
     );
 
     if (!hasPermission) {
-      throw new ForbiddenException('Insufficient permissions');
+      throw new ForbiddenException("Insufficient permissions");
     }
 
     return true;

@@ -1,15 +1,15 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { AsyncApi, AsyncApiSub } from 'nestjs-asyncapi';
-import { Injectable } from '@nestjs/common';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { AsyncApi, AsyncApiSub } from "nestjs-asyncapi";
+import { Injectable } from "@nestjs/common";
 
 class CardDataDto {
   @ApiProperty({ example: 55 })
   id: number;
 
-  @ApiProperty({ example: 'Implement realtime updates' })
+  @ApiProperty({ example: "Implement realtime updates" })
   title: string;
 
-  @ApiProperty({ example: 'Add socket events for list/card updates' })
+  @ApiProperty({ example: "Add socket events for list/card updates" })
   description: string;
 
   @ApiProperty({ example: 1000 })
@@ -46,7 +46,7 @@ class CardCreatedUpdatedEventDto {
   @ApiProperty({ type: () => CardDataDto })
   data: CardDataDto;
 
-  @ApiProperty({ example: '2026-02-20T18:10:00.000Z' })
+  @ApiProperty({ example: "2026-02-20T18:10:00.000Z" })
   timestamp: string;
 }
 
@@ -63,7 +63,7 @@ class CardMovedEventDto {
   @ApiProperty({ type: () => CardMovedDataDto })
   data: CardMovedDataDto;
 
-  @ApiProperty({ example: '2026-02-20T18:10:00.000Z' })
+  @ApiProperty({ example: "2026-02-20T18:10:00.000Z" })
   timestamp: string;
 }
 
@@ -77,7 +77,7 @@ class CardDeletedEventDto {
   @ApiProperty({ example: 55 })
   cardId: number;
 
-  @ApiProperty({ example: '2026-02-20T18:10:00.000Z' })
+  @ApiProperty({ example: "2026-02-20T18:10:00.000Z" })
   timestamp: string;
 }
 
@@ -94,7 +94,7 @@ class CardMemberChangedEventDto {
   @ApiProperty({ example: 3 })
   actorId: number;
 
-  @ApiProperty({ example: '2026-02-20T18:10:00.000Z' })
+  @ApiProperty({ example: "2026-02-20T18:10:00.000Z" })
   timestamp: string;
 }
 
@@ -102,37 +102,37 @@ class CardMemberChangedEventDto {
 @AsyncApi()
 export class CardsEventsAsyncApiContract {
   @AsyncApiSub({
-    channel: 'card:created',
+    channel: "card:created",
     message: { payload: CardCreatedUpdatedEventDto },
   })
   cardCreated() {}
 
   @AsyncApiSub({
-    channel: 'card:updated',
+    channel: "card:updated",
     message: { payload: CardCreatedUpdatedEventDto },
   })
   cardUpdated() {}
 
   @AsyncApiSub({
-    channel: 'card:moved',
+    channel: "card:moved",
     message: { payload: CardMovedEventDto },
   })
   cardMoved() {}
 
   @AsyncApiSub({
-    channel: 'card:deleted',
+    channel: "card:deleted",
     message: { payload: CardDeletedEventDto },
   })
   cardDeleted() {}
 
   @AsyncApiSub({
-    channel: 'card:memberAdded',
+    channel: "card:memberAdded",
     message: { payload: CardMemberChangedEventDto },
   })
   cardMemberAdded() {}
 
   @AsyncApiSub({
-    channel: 'card:memberRemoved',
+    channel: "card:memberRemoved",
     message: { payload: CardMemberChangedEventDto },
   })
   cardMemberRemoved() {}

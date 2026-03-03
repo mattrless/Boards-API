@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException, PipeTransform } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, NotFoundException, PipeTransform } from "@nestjs/common";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class UserExistsPipe implements PipeTransform<number, Promise<number>> {
@@ -12,7 +12,7 @@ export class UserExistsPipe implements PipeTransform<number, Promise<number>> {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException("User not found");
     }
 
     return id;

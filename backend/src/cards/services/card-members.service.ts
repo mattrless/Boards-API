@@ -5,15 +5,15 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-} from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { ActionResponseDto } from 'src/users/dto/action-response.dto';
-import { plainToInstance } from 'class-transformer';
-import { Prisma } from 'generated/prisma/client';
-import { CardMemberResponseDto } from '../dto/card-members-response.dto';
-import { AddCardMemberDto } from '../dto/add-card-member.dto';
-import { AuthUser } from 'src/auth/types/auth-user.type';
-import { CardsEventsService } from 'src/websocket/services/cards-events.service';
+} from "@nestjs/common";
+import { PrismaService } from "src/prisma/prisma.service";
+import { ActionResponseDto } from "src/users/dto/action-response.dto";
+import { plainToInstance } from "class-transformer";
+import { Prisma } from "generated/prisma/client";
+import { CardMemberResponseDto } from "../dto/card-members-response.dto";
+import { AddCardMemberDto } from "../dto/add-card-member.dto";
+import { AuthUser } from "src/auth/types/auth-user.type";
+import { CardsEventsService } from "src/websocket/services/cards-events.service";
 
 @Injectable()
 export class CardMembersService {
@@ -32,7 +32,7 @@ export class CardMembersService {
       const currentUserId = currentUser.id;
       const targetUserId = addCardMemberDto.userId;
       const currentUserIsSystemAdmin =
-        currentUser.systemRole?.name?.toLowerCase().trim() === 'admin';
+        currentUser.systemRole?.name?.toLowerCase().trim() === "admin";
 
       const memberships = await this.prismaService.userBoard.findMany({
         where: {
@@ -61,18 +61,18 @@ export class CardMembersService {
       );
 
       if (!currentMembership && !currentUserIsSystemAdmin) {
-        throw new ForbiddenException('Current user is not a board member.');
+        throw new ForbiddenException("Current user is not a board member.");
       }
 
       if (!targetMembership) {
         throw new NotFoundException(
-          'Target user is not a member of this board.',
+          "Target user is not a member of this board.",
         );
       }
 
       const currentRole =
-        currentMembership?.boardRole.name.toLowerCase().trim() ?? '';
-      const currentUserIsBoardAdmin = currentRole === 'admin';
+        currentMembership?.boardRole.name.toLowerCase().trim() ?? "";
+      const currentUserIsBoardAdmin = currentRole === "admin";
 
       if (
         !currentUserIsSystemAdmin &&
@@ -80,7 +80,7 @@ export class CardMembersService {
         currentUserId !== targetUserId
       ) {
         throw new ForbiddenException(
-          'Members can only add themselves to a card.',
+          "Members can only add themselves to a card.",
         );
       }
 
@@ -101,7 +101,7 @@ export class CardMembersService {
 
       return plainToInstance(
         ActionResponseDto,
-        { message: 'Member added to card successfully' },
+        { message: "Member added to card successfully" },
         { excludeExtraneousValues: true },
       );
     } catch (error) {
@@ -111,19 +111,19 @@ export class CardMembersService {
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
+        error.code === "P2002"
       ) {
-        throw new ConflictException('User is already assigned to this card.');
+        throw new ConflictException("User is already assigned to this card.");
       }
 
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2003'
+        error.code === "P2003"
       ) {
-        throw new NotFoundException('Card or user not found.');
+        throw new NotFoundException("Card or user not found.");
       }
 
-      throw new InternalServerErrorException('Failed to add member to card.');
+      throw new InternalServerErrorException("Failed to add member to card.");
     }
   }
 
@@ -136,7 +136,7 @@ export class CardMembersService {
     try {
       const currentUserId = currentUser.id;
       const currentUserIsSystemAdmin =
-        currentUser.systemRole?.name?.toLowerCase().trim() === 'admin';
+        currentUser.systemRole?.name?.toLowerCase().trim() === "admin";
 
       const memberships = await this.prismaService.userBoard.findMany({
         where: {
@@ -165,18 +165,18 @@ export class CardMembersService {
       );
 
       if (!currentMembership && !currentUserIsSystemAdmin) {
-        throw new ForbiddenException('Current user is not a board member.');
+        throw new ForbiddenException("Current user is not a board member.");
       }
 
       if (!targetMembership) {
         throw new NotFoundException(
-          'Target user is not a member of this board.',
+          "Target user is not a member of this board.",
         );
       }
 
       const currentRole =
-        currentMembership?.boardRole.name.toLowerCase().trim() ?? '';
-      const currentUserIsBoardAdmin = currentRole === 'admin';
+        currentMembership?.boardRole.name.toLowerCase().trim() ?? "";
+      const currentUserIsBoardAdmin = currentRole === "admin";
 
       if (
         !currentUserIsSystemAdmin &&
@@ -184,7 +184,7 @@ export class CardMembersService {
         currentUserId !== targetUserId
       ) {
         throw new ForbiddenException(
-          'Members can only remove themselves from a card.',
+          "Members can only remove themselves from a card.",
         );
       }
 
@@ -196,7 +196,7 @@ export class CardMembersService {
       });
 
       if (deleted.count === 0) {
-        throw new NotFoundException('Member is not assigned to this card.');
+        throw new NotFoundException("Member is not assigned to this card.");
       }
 
       this.cardsEventsService.emitCardMemberRemoved(boardId, cardId, {
@@ -209,7 +209,7 @@ export class CardMembersService {
 
       return plainToInstance(
         ActionResponseDto,
-        { message: 'Member removed from card successfully' },
+        { message: "Member removed from card successfully" },
         { excludeExtraneousValues: true },
       );
     } catch (error) {
@@ -218,7 +218,7 @@ export class CardMembersService {
       }
 
       throw new InternalServerErrorException(
-        'Failed to remove member from card.',
+        "Failed to remove member from card.",
       );
     }
   }
@@ -233,7 +233,7 @@ export class CardMembersService {
           },
         },
         orderBy: {
-          createdAt: 'asc',
+          createdAt: "asc",
         },
         select: {
           createdAt: true,
@@ -269,7 +269,7 @@ export class CardMembersService {
         throw error;
       }
 
-      throw new InternalServerErrorException('Failed to fetch card members.');
+      throw new InternalServerErrorException("Failed to fetch card members.");
     }
   }
 }

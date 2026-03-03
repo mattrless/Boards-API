@@ -1,11 +1,11 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsOptional, Min } from 'class-validator';
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { IsInt, IsOptional, Min } from "class-validator";
 
 export class UpdateCardPositionDto {
   @ApiPropertyOptional({
     example: 2,
     description:
-      'Target list id. If omitted, the card stays in its current list.',
+      "Target list id. If omitted, the card stays in its current list.",
   })
   @IsOptional()
   @IsInt()
@@ -14,7 +14,7 @@ export class UpdateCardPositionDto {
 
   @ApiPropertyOptional({
     example: 3,
-    description: 'Id of the card placed before the target position.',
+    description: "Id of the card placed before the target position.",
   })
   @IsOptional()
   @IsInt()
@@ -23,7 +23,7 @@ export class UpdateCardPositionDto {
 
   @ApiPropertyOptional({
     example: 7,
-    description: 'Id of the card placed after the target position.',
+    description: "Id of the card placed after the target position.",
   })
   @IsOptional()
   @IsInt()

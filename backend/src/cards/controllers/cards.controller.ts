@@ -8,77 +8,77 @@ import {
   UseGuards,
   ParseIntPipe,
   Put,
-} from '@nestjs/common';
-import { Permissions } from 'src/auth/decorators/permissions.decorator';
-import { AuthGuard } from '@nestjs/passport';
-import { ListBelongsToBoardGuard } from 'src/lists/guards/list-belongs-to-board.guard';
-import { BoardPermissionsGuard } from 'src/auth/guards/board-permissions.guard';
-import { ApiTags } from '@nestjs/swagger';
-import { CardsService } from '../services/cards.service';
+} from "@nestjs/common";
+import { Permissions } from "src/auth/decorators/permissions.decorator";
+import { AuthGuard } from "@nestjs/passport";
+import { ListBelongsToBoardGuard } from "src/lists/guards/list-belongs-to-board.guard";
+import { BoardPermissionsGuard } from "src/auth/guards/board-permissions.guard";
+import { ApiTags } from "@nestjs/swagger";
+import { CardsService } from "../services/cards.service";
 import {
   ApiCreateCardDocs,
   ApiFindAllCardsDocs,
   ApiFindOneCardDocs,
   ApiRemoveCardDocs,
   ApiUpdateCardDocs,
-} from '../docs/cards.docs';
-import { CreateCardDto } from '../dto/create-card.dto';
-import { CardBelongsToListGuard } from '../guards/card-belongs-to-list.guard';
-import { UpdateCardDto } from '../dto/update-card.dto';
+} from "../docs/cards.docs";
+import { CreateCardDto } from "../dto/create-card.dto";
+import { CardBelongsToListGuard } from "../guards/card-belongs-to-list.guard";
+import { UpdateCardDto } from "../dto/update-card.dto";
 
-@ApiTags('Cards')
-@Controller('boards/:boardId/lists/:listId/cards')
+@ApiTags("Cards")
+@Controller("boards/:boardId/lists/:listId/cards")
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
   @ApiCreateCardDocs()
-  @UseGuards(AuthGuard('jwt'), BoardPermissionsGuard, ListBelongsToBoardGuard)
-  @Permissions('card_create')
+  @UseGuards(AuthGuard("jwt"), BoardPermissionsGuard, ListBelongsToBoardGuard)
+  @Permissions("card_create")
   @Post()
   create(
-    @Param('boardId', ParseIntPipe) boardId: number,
-    @Param('listId', ParseIntPipe) listId: number,
+    @Param("boardId", ParseIntPipe) boardId: number,
+    @Param("listId", ParseIntPipe) listId: number,
     @Body() createCardDto: CreateCardDto,
   ) {
     return this.cardsService.create(boardId, listId, createCardDto);
   }
 
   @ApiFindAllCardsDocs()
-  @UseGuards(AuthGuard('jwt'), BoardPermissionsGuard, ListBelongsToBoardGuard)
-  @Permissions('card_read')
+  @UseGuards(AuthGuard("jwt"), BoardPermissionsGuard, ListBelongsToBoardGuard)
+  @Permissions("card_read")
   @Get()
-  findAll(@Param('listId', ParseIntPipe) listId: number) {
+  findAll(@Param("listId", ParseIntPipe) listId: number) {
     return this.cardsService.findAll(listId);
   }
 
   @ApiFindOneCardDocs()
   @UseGuards(
-    AuthGuard('jwt'),
+    AuthGuard("jwt"),
     BoardPermissionsGuard,
     ListBelongsToBoardGuard,
     CardBelongsToListGuard,
   )
-  @Permissions('card_read')
-  @Get(':cardId')
+  @Permissions("card_read")
+  @Get(":cardId")
   findOne(
-    @Param('listId', ParseIntPipe) listId: number,
-    @Param('cardId', ParseIntPipe) cardId: number,
+    @Param("listId", ParseIntPipe) listId: number,
+    @Param("cardId", ParseIntPipe) cardId: number,
   ) {
     return this.cardsService.findOne(listId, cardId);
   }
 
   @UseGuards(
-    AuthGuard('jwt'),
+    AuthGuard("jwt"),
     BoardPermissionsGuard,
     ListBelongsToBoardGuard,
     CardBelongsToListGuard,
   )
   @ApiUpdateCardDocs()
-  @Permissions('card_update')
-  @Put(':cardId')
+  @Permissions("card_update")
+  @Put(":cardId")
   update(
-    @Param('listId', ParseIntPipe) listId: number,
-    @Param('cardId', ParseIntPipe) cardId: number,
+    @Param("listId", ParseIntPipe) listId: number,
+    @Param("cardId", ParseIntPipe) cardId: number,
     @Body() updateCardDto: UpdateCardDto,
   ) {
     return this.cardsService.update(listId, cardId, updateCardDto);
@@ -86,16 +86,16 @@ export class CardsController {
 
   @ApiRemoveCardDocs()
   @UseGuards(
-    AuthGuard('jwt'),
+    AuthGuard("jwt"),
     BoardPermissionsGuard,
     ListBelongsToBoardGuard,
     CardBelongsToListGuard,
   )
-  @Permissions('card_delete')
-  @Delete(':cardId')
+  @Permissions("card_delete")
+  @Delete(":cardId")
   remove(
-    @Param('listId', ParseIntPipe) listId: number,
-    @Param('cardId', ParseIntPipe) cardId: number,
+    @Param("listId", ParseIntPipe) listId: number,
+    @Param("cardId", ParseIntPipe) cardId: number,
   ) {
     return this.cardsService.remove(listId, cardId);
   }

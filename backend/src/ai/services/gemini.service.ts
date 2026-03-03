@@ -1,7 +1,7 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { plainToInstance } from 'class-transformer';
-import { ResponseDescriptionDto } from '../dto/response-description.dto';
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { plainToInstance } from "class-transformer";
+import { ResponseDescriptionDto } from "../dto/response-description.dto";
 
 type GeminiResponse = { text?: string | null };
 type GeminiClient = {
@@ -19,15 +19,15 @@ export class GeminiService {
   private readonly model: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.model = this.configService.getOrThrow<string>('GEMINI_MODEL');
+    this.model = this.configService.getOrThrow<string>("GEMINI_MODEL");
     this.aiClientPromise = this.createAiClient();
   }
 
   private async createAiClient(): Promise<GeminiClient> {
-    const { GoogleGenAI } = await import('@google/genai');
+    const { GoogleGenAI } = await import("@google/genai");
 
     return new GoogleGenAI({
-      apiKey: this.configService.getOrThrow<string>('GEMINI_API_KEY'),
+      apiKey: this.configService.getOrThrow<string>("GEMINI_API_KEY"),
     });
   }
 
@@ -51,14 +51,14 @@ export class GeminiService {
       });
     } catch {
       throw new InternalServerErrorException(
-        'Failed to generate description with Gemini.',
+        "Failed to generate description with Gemini.",
       );
     }
 
     const generatedText = response.text?.trim();
     if (!generatedText) {
       throw new InternalServerErrorException(
-        'Gemini did not return generated text.',
+        "Gemini did not return generated text.",
       );
     }
 
@@ -90,14 +90,14 @@ export class GeminiService {
       });
     } catch {
       throw new InternalServerErrorException(
-        'Failed to check grammar with Gemini.',
+        "Failed to check grammar with Gemini.",
       );
     }
 
     const correctedText = response.text?.trim();
     if (!correctedText) {
       throw new InternalServerErrorException(
-        'Gemini did not return corrected text.',
+        "Gemini did not return corrected text.",
       );
     }
 

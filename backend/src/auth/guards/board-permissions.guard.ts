@@ -5,13 +5,13 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PermissionType } from 'generated/prisma/client';
-import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
-import { AuthUser } from '../types/auth-user.type';
-import type { Request } from 'express';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { PrismaService } from "src/prisma/prisma.service";
+import { PermissionType } from "generated/prisma/client";
+import { PERMISSIONS_KEY } from "../decorators/permissions.decorator";
+import { AuthUser } from "../types/auth-user.type";
+import type { Request } from "express";
 
 @Injectable()
 export class BoardPermissionsGuard implements CanActivate {
@@ -37,12 +37,12 @@ export class BoardPermissionsGuard implements CanActivate {
     const user = request.user;
 
     if (!user?.id) {
-      throw new ForbiddenException('User not authenticated');
+      throw new ForbiddenException("User not authenticated");
     }
 
     const boardId = Number(request.params.boardId);
     if (!Number.isInteger(boardId)) {
-      throw new BadRequestException('Invalid board id');
+      throw new BadRequestException("Invalid board id");
     }
 
     const board = await this.prismaService.board.findFirst({
@@ -51,11 +51,11 @@ export class BoardPermissionsGuard implements CanActivate {
     });
 
     if (!board) {
-      throw new NotFoundException('Board not found');
+      throw new NotFoundException("Board not found");
     }
 
     const isSystemAdmin =
-      user.systemRole?.name?.toLowerCase().trim() === 'admin';
+      user.systemRole?.name?.toLowerCase().trim() === "admin";
     if (isSystemAdmin) {
       return true;
     }
@@ -90,7 +90,7 @@ export class BoardPermissionsGuard implements CanActivate {
     });
 
     if (!membership) {
-      throw new ForbiddenException('User is not a board member');
+      throw new ForbiddenException("User is not a board member");
     }
 
     const userPermissions = membership.boardRole.boardRoleBoardPermissions.map(
@@ -102,7 +102,7 @@ export class BoardPermissionsGuard implements CanActivate {
     );
 
     if (!hasPermission) {
-      throw new ForbiddenException('Insufficient permissions');
+      throw new ForbiddenException("Insufficient permissions");
     }
 
     return true;

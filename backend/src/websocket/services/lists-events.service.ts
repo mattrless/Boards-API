@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { BoardGateway } from '../gateways/board.gateway';
+import { Injectable } from "@nestjs/common";
+import { BoardGateway } from "../gateways/board.gateway";
 
 @Injectable()
 export class ListsEventsService {
@@ -14,18 +14,18 @@ export class ListsEventsService {
   }
 
   emitListCreated(boardId: number, payload: Record<string, unknown>) {
-    this.emitToBoard(boardId, 'list:created', payload);
+    this.emitToBoard(boardId, "list:created", payload);
   }
 
   emitListUpdated(boardId: number, payload: Record<string, unknown>) {
-    this.emitToBoard(boardId, 'list:updated', payload);
+    this.emitToBoard(boardId, "list:updated", payload);
   }
 
   emitListMoved(boardId: number, payload: Record<string, unknown>) {
-    this.emitToBoard(boardId, 'list:moved', payload);
+    this.emitToBoard(boardId, "list:moved", payload);
   }
 
   emitListDeleted(boardId: number, payload: Record<string, unknown>) {
-    this.emitToBoard(boardId, 'list:deleted', payload);
+    this.emitToBoard(boardId, "list:deleted", payload);
   }
 }

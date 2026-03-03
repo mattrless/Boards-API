@@ -1,12 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { ApiProperty } from "@nestjs/swagger";
+import { Expose } from "class-transformer";
 
 export class ListSummaryResponseDto {
   @ApiProperty({ example: 1 })
   @Expose()
   id: number;
 
-  @ApiProperty({ example: 'To Do' })
+  @ApiProperty({ example: "To Do" })
   @Expose()
   title: string;
 
@@ -14,11 +14,11 @@ export class ListSummaryResponseDto {
   @Expose()
   position: number;
 
-  @ApiProperty({ example: '2023-10-27T10:00:00Z' })
+  @ApiProperty({ example: "2023-10-27T10:00:00Z" })
   @Expose()
   createdAt: Date;
 
-  @ApiProperty({ example: '2023-10-27T10:00:00Z' })
+  @ApiProperty({ example: "2023-10-27T10:00:00Z" })
   @Expose()
   updatedAt: Date;
 }

@@ -1,10 +1,10 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsOptional, Min } from 'class-validator';
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { IsInt, IsOptional, Min } from "class-validator";
 
 export class UpdateListPositionDto {
   @ApiPropertyOptional({
     example: 8,
-    description: 'Id from list placed previous the target list (same board).',
+    description: "Id from list placed previous the target list (same board).",
   })
   @IsOptional()
   @IsInt()
@@ -13,7 +13,7 @@ export class UpdateListPositionDto {
 
   @ApiPropertyOptional({
     example: 3,
-    description: 'Id from list placed next to target list (same board).',
+    description: "Id from list placed next to target list (same board).",
   })
   @IsOptional()
   @IsInt()

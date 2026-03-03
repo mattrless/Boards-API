@@ -3,17 +3,17 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-} from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '../../generated/prisma/client';
-import bcrypt from 'bcrypt';
-import { ConfigService } from '@nestjs/config';
-import { plainToInstance } from 'class-transformer';
-import { UserResponseDto } from './dto/user-response.dto';
-import { ActionResponseDto } from './dto/action-response.dto';
-import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
+} from "@nestjs/common";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { PrismaService } from "src/prisma/prisma.service";
+import { Prisma } from "../../generated/prisma/client";
+import bcrypt from "bcrypt";
+import { ConfigService } from "@nestjs/config";
+import { plainToInstance } from "class-transformer";
+import { UserResponseDto } from "./dto/user-response.dto";
+import { ActionResponseDto } from "./dto/action-response.dto";
+import { AdminUpdateUserDto } from "./dto/admin-update-user.dto";
 
 @Injectable()
 export class UsersService {
@@ -51,11 +51,11 @@ export class UsersService {
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
+        error.code === "P2002"
       ) {
-        throw new ConflictException('Email already in use');
+        throw new ConflictException("Email already in use");
       }
-      throw new InternalServerErrorException('Failed to create user');
+      throw new InternalServerErrorException("Failed to create user");
     }
   }
 
@@ -70,7 +70,7 @@ export class UsersService {
         excludeExtraneousValues: true,
       });
     } catch {
-      throw new InternalServerErrorException('Failed to fetch users');
+      throw new InternalServerErrorException("Failed to fetch users");
     }
   }
 
@@ -121,11 +121,11 @@ export class UsersService {
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
+        error.code === "P2002"
       ) {
-        throw new ConflictException('Email already in use');
+        throw new ConflictException("Email already in use");
       }
-      throw new InternalServerErrorException('Failed to update user');
+      throw new InternalServerErrorException("Failed to update user");
     }
   }
 
@@ -161,14 +161,14 @@ export class UsersService {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         switch (error.code) {
-          case 'P2025':
-            throw new NotFoundException('User not found');
-          case 'P2002':
-            throw new ConflictException('Email already in use');
+          case "P2025":
+            throw new NotFoundException("User not found");
+          case "P2002":
+            throw new ConflictException("Email already in use");
         }
       }
 
-      throw new InternalServerErrorException('Failed to update user');
+      throw new InternalServerErrorException("Failed to update user");
     }
   }
 
@@ -192,18 +192,18 @@ export class UsersService {
 
       if (ownsActiveBoards && ownsArchivedBoards) {
         throw new ConflictException(
-          'Cannot delete user: transfer ownership of active boards and archived boards before deleting the user.',
+          "Cannot delete user: transfer ownership of active boards and archived boards before deleting the user.",
         );
       }
 
       if (ownsActiveBoards) {
         throw new ConflictException(
-          'Cannot delete user: transfer ownership of active boards before deleting the user.',
+          "Cannot delete user: transfer ownership of active boards before deleting the user.",
         );
       }
 
       throw new ConflictException(
-        'Cannot delete user: transfer ownership of archived boards before deleting the user.',
+        "Cannot delete user: transfer ownership of archived boards before deleting the user.",
       );
     }
 
@@ -214,7 +214,7 @@ export class UsersService {
 
     return plainToInstance(
       ActionResponseDto,
-      { message: 'User deleted successfully' },
+      { message: "User deleted successfully" },
       {
         excludeExtraneousValues: true,
       },
@@ -231,12 +231,12 @@ export class UsersService {
     });
 
     if (result.count === 0) {
-      throw new NotFoundException('User not found or not deleted');
+      throw new NotFoundException("User not found or not deleted");
     }
 
     return plainToInstance(
       ActionResponseDto,
-      { message: 'User restored successfully' },
+      { message: "User restored successfully" },
       {
         excludeExtraneousValues: true,
       },
@@ -261,7 +261,7 @@ export class UsersService {
   private async getDefaultSystemRoleId() {
     const systemRole = await this.prismaService.systemRole.findFirst({
       where: {
-        name: 'user',
+        name: "user",
       },
     });
 
@@ -275,7 +275,7 @@ export class UsersService {
   }
 
   private async hashPassword(password: string) {
-    const rounds = Number(this.config.get('BCRYPT_SALT_ROUNDS')) || 10;
+    const rounds = Number(this.config.get("BCRYPT_SALT_ROUNDS")) || 10;
     const hashedPassword = await bcrypt.hash(password, rounds);
     return hashedPassword;
   }

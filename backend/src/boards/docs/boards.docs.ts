@@ -1,156 +1,156 @@
-import { applyDecorators } from '@nestjs/common';
+import { applyDecorators } from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiResponse,
-} from '@nestjs/swagger';
-import { BoardResponseDto } from '../dto/board-response.dto';
-import { ActionResponseDto } from 'src/users/dto/action-response.dto';
-import { BoardDetailsResponseDto } from '../dto/board-details-response.dto';
-import { BoardOwnerResponseDto } from '../dto/board-owner-response.dto';
-import { MyBoardResponseDto } from '../dto/my-board-response.dto';
+} from "@nestjs/swagger";
+import { BoardResponseDto } from "../dto/board-response.dto";
+import { ActionResponseDto } from "src/users/dto/action-response.dto";
+import { BoardDetailsResponseDto } from "../dto/board-details-response.dto";
+import { BoardOwnerResponseDto } from "../dto/board-owner-response.dto";
+import { MyBoardResponseDto } from "../dto/my-board-response.dto";
 
 export function ApiCreateBoardDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Create board' }),
+    ApiOperation({ summary: "Create board" }),
     ApiOkResponse({
-      description: 'The board has been successfully created.',
+      description: "The board has been successfully created.",
       type: BoardResponseDto,
     }),
-    ApiResponse({ status: 400, description: 'Invalid input data.' }),
+    ApiResponse({ status: 400, description: "Invalid input data." }),
     ApiResponse({
       status: 403,
-      description: 'Forbidden: Insufficient permissions.',
+      description: "Forbidden: Insufficient permissions.",
     }),
-    ApiBearerAuth('JWT'),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiFindAllBoardsDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Retrieve all boards' }),
+    ApiOperation({ summary: "Retrieve all boards" }),
     ApiOkResponse({
-      description: 'List of all boards returned successfully.',
+      description: "List of all boards returned successfully.",
       type: [BoardOwnerResponseDto],
     }),
     ApiResponse({
       status: 403,
-      description: 'Forbidden: Insufficient permissions.',
+      description: "Forbidden: Insufficient permissions.",
     }),
-    ApiBearerAuth('JWT'),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiFindMyBoardsDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Retrieve boards where current user is a member' }),
+    ApiOperation({ summary: "Retrieve boards where current user is a member" }),
     ApiOkResponse({
-      description: 'List of user boards returned successfully.',
+      description: "List of user boards returned successfully.",
       type: [MyBoardResponseDto],
     }),
     ApiResponse({
       status: 403,
-      description: 'Forbidden: Insufficient permissions.',
+      description: "Forbidden: Insufficient permissions.",
     }),
-    ApiBearerAuth('JWT'),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiFindOneBoardDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Get a specific board by ID' }),
+    ApiOperation({ summary: "Get a specific board by ID" }),
     ApiOkResponse({
-      description: 'Board found and returned.',
+      description: "Board found and returned.",
       type: BoardDetailsResponseDto,
     }),
-    ApiResponse({ status: 404, description: 'Board not found.' }),
-    ApiBearerAuth('JWT'),
+    ApiResponse({ status: 404, description: "Board not found." }),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiUpdateBoardDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Update board by id' }),
+    ApiOperation({ summary: "Update board by id" }),
     ApiOkResponse({
-      description: 'The board has been successfully updated.',
+      description: "The board has been successfully updated.",
       type: BoardResponseDto,
     }),
-    ApiResponse({ status: 400, description: 'Invalid input data.' }),
+    ApiResponse({ status: 400, description: "Invalid input data." }),
     ApiResponse({
       status: 403,
-      description: 'Forbidden: Insufficient permissions.',
+      description: "Forbidden: Insufficient permissions.",
     }),
-    ApiResponse({ status: 404, description: 'Board not found.' }),
-    ApiBearerAuth('JWT'),
+    ApiResponse({ status: 404, description: "Board not found." }),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiRemoveBoardDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Delete board by id' }),
+    ApiOperation({ summary: "Delete board by id" }),
     ApiOkResponse({
-      description: 'The board has been successfully deleted.',
+      description: "The board has been successfully deleted.",
       type: BoardResponseDto,
     }),
     ApiResponse({
       status: 403,
-      description: 'Forbidden: Insufficient permissions.',
+      description: "Forbidden: Insufficient permissions.",
     }),
-    ApiResponse({ status: 404, description: 'Board not found.' }),
-    ApiBearerAuth('JWT'),
+    ApiResponse({ status: 404, description: "Board not found." }),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiRestoreBoardDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Restore board by id' }),
+    ApiOperation({ summary: "Restore board by id" }),
     ApiOkResponse({
-      description: 'The board has been successfully restired.',
+      description: "The board has been successfully restired.",
       type: BoardResponseDto,
     }),
     ApiResponse({
       status: 403,
-      description: 'Forbidden: Insufficient permissions.',
+      description: "Forbidden: Insufficient permissions.",
     }),
-    ApiResponse({ status: 404, description: 'Board not found.' }),
-    ApiBearerAuth('JWT'),
+    ApiResponse({ status: 404, description: "Board not found." }),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiTransferOwnershipDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Transfer board ownership to another member.' }),
+    ApiOperation({ summary: "Transfer board ownership to another member." }),
     ApiParam({
-      name: 'boardId',
+      name: "boardId",
       type: Number,
-      description: 'Target board id.',
+      description: "Target board id.",
     }),
     ApiParam({
-      name: 'targetUserId',
+      name: "targetUserId",
       type: Number,
-      description: 'User id that will become the new owner.',
+      description: "User id that will become the new owner.",
     }),
     ApiOkResponse({
-      description: 'Board ownership transferred successfully.',
+      description: "Board ownership transferred successfully.",
       type: ActionResponseDto,
     }),
-    ApiResponse({ status: 400, description: 'Invalid input data.' }),
-    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({ status: 400, description: "Invalid input data." }),
+    ApiResponse({ status: 401, description: "Unauthorized." }),
     ApiResponse({
       status: 403,
-      description: 'Forbidden: only the current owner can transfer ownership.',
+      description: "Forbidden: only the current owner can transfer ownership.",
     }),
     ApiResponse({
       status: 404,
-      description: 'Board or target member not found.',
+      description: "Board or target member not found.",
     }),
     ApiResponse({
       status: 409,
       description:
-        'Conflict: target is already owner or has an unsupported board role.',
+        "Conflict: target is already owner or has an unsupported board role.",
     }),
-    ApiBearerAuth('JWT'),
+    ApiBearerAuth("JWT"),
   );
 }

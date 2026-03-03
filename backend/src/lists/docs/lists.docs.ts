@@ -1,4 +1,4 @@
-import { applyDecorators } from '@nestjs/common';
+import { applyDecorators } from "@nestjs/common";
 import {
   ApiBody,
   ApiBearerAuth,
@@ -6,197 +6,197 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
-} from '@nestjs/swagger';
-import { ListResponseDto } from '../dto/list-response.dto';
-import { ListSummaryResponseDto } from '../dto/list-summary-response.dto';
-import { ActionResponseDto } from 'src/users/dto/action-response.dto';
+} from "@nestjs/swagger";
+import { ListResponseDto } from "../dto/list-response.dto";
+import { ListSummaryResponseDto } from "../dto/list-summary-response.dto";
+import { ActionResponseDto } from "src/users/dto/action-response.dto";
 
 export function ApiCreateListDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Create a new list in a board' }),
+    ApiOperation({ summary: "Create a new list in a board" }),
     ApiParam({
-      name: 'boardId',
+      name: "boardId",
       type: Number,
-      description: 'Target board id.',
+      description: "Target board id.",
     }),
     ApiOkResponse({
-      description: 'List created successfully.',
+      description: "List created successfully.",
       type: ListResponseDto,
     }),
-    ApiResponse({ status: 400, description: 'Invalid input data.' }),
-    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({ status: 400, description: "Invalid input data." }),
+    ApiResponse({ status: 401, description: "Unauthorized." }),
     ApiResponse({
       status: 403,
       description:
-        'Forbidden: current user is not a board member or lacks permission.',
+        "Forbidden: current user is not a board member or lacks permission.",
     }),
-    ApiResponse({ status: 404, description: 'Board not found.' }),
-    ApiBearerAuth('JWT'),
+    ApiResponse({ status: 404, description: "Board not found." }),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiListsByBoardIdDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Get all lists from a board' }),
+    ApiOperation({ summary: "Get all lists from a board" }),
     ApiParam({
-      name: 'boardId',
+      name: "boardId",
       type: Number,
-      description: 'Target board id.',
+      description: "Target board id.",
     }),
     ApiOkResponse({
-      description: 'Board lists returned successfully.',
+      description: "Board lists returned successfully.",
       type: [ListSummaryResponseDto],
     }),
-    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({ status: 401, description: "Unauthorized." }),
     ApiResponse({
       status: 403,
       description:
-        'Forbidden: current user is not a board member or lacks permission.',
+        "Forbidden: current user is not a board member or lacks permission.",
     }),
-    ApiResponse({ status: 404, description: 'Board not found.' }),
-    ApiBearerAuth('JWT'),
+    ApiResponse({ status: 404, description: "Board not found." }),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiFindOneListDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Get one list from a board' }),
+    ApiOperation({ summary: "Get one list from a board" }),
     ApiParam({
-      name: 'boardId',
+      name: "boardId",
       type: Number,
-      description: 'Target board id.',
+      description: "Target board id.",
     }),
     ApiParam({
-      name: 'listId',
+      name: "listId",
       type: Number,
-      description: 'Target list id.',
+      description: "Target list id.",
     }),
     ApiOkResponse({
-      description: 'List returned successfully.',
+      description: "List returned successfully.",
       type: ListResponseDto,
     }),
-    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({ status: 401, description: "Unauthorized." }),
     ApiResponse({
       status: 403,
       description:
-        'Forbidden: current user is not a board member or lacks permission.',
+        "Forbidden: current user is not a board member or lacks permission.",
     }),
-    ApiResponse({ status: 404, description: 'Board or list not found.' }),
-    ApiBearerAuth('JWT'),
+    ApiResponse({ status: 404, description: "Board or list not found." }),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiUpdateListDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Update a list' }),
+    ApiOperation({ summary: "Update a list" }),
     ApiParam({
-      name: 'boardId',
+      name: "boardId",
       type: Number,
-      description: 'Target board id.',
+      description: "Target board id.",
     }),
     ApiParam({
-      name: 'listId',
+      name: "listId",
       type: Number,
-      description: 'Target list id.',
+      description: "Target list id.",
     }),
     ApiOkResponse({
-      description: 'List updated successfully.',
+      description: "List updated successfully.",
       type: ListResponseDto,
     }),
-    ApiResponse({ status: 400, description: 'Invalid input data.' }),
-    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({ status: 400, description: "Invalid input data." }),
+    ApiResponse({ status: 401, description: "Unauthorized." }),
     ApiResponse({
       status: 403,
       description:
-        'Forbidden: current user is not a board member or lacks permission.',
+        "Forbidden: current user is not a board member or lacks permission.",
     }),
-    ApiResponse({ status: 404, description: 'Board or list not found.' }),
-    ApiBearerAuth('JWT'),
+    ApiResponse({ status: 404, description: "Board or list not found." }),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiUpdateListPositionDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Move a list to a new position' }),
+    ApiOperation({ summary: "Move a list to a new position" }),
     ApiParam({
-      name: 'boardId',
+      name: "boardId",
       type: Number,
-      description: 'Target board id.',
+      description: "Target board id.",
     }),
     ApiParam({
-      name: 'listId',
+      name: "listId",
       type: Number,
-      description: 'Target list id.',
+      description: "Target list id.",
     }),
     ApiBody({
       schema: {
         oneOf: [
           {
-            type: 'object',
+            type: "object",
             properties: {
-              prevListId: { type: 'integer', minimum: 1 },
+              prevListId: { type: "integer", minimum: 1 },
             },
-            required: ['prevListId'],
+            required: ["prevListId"],
           },
           {
-            type: 'object',
+            type: "object",
             properties: {
-              nextListId: { type: 'integer', minimum: 1 },
+              nextListId: { type: "integer", minimum: 1 },
             },
-            required: ['nextListId'],
+            required: ["nextListId"],
           },
           {
-            type: 'object',
+            type: "object",
             properties: {
-              prevListId: { type: 'integer', minimum: 1 },
-              nextListId: { type: 'integer', minimum: 1 },
+              prevListId: { type: "integer", minimum: 1 },
+              nextListId: { type: "integer", minimum: 1 },
             },
-            required: ['prevListId', 'nextListId'],
+            required: ["prevListId", "nextListId"],
           },
         ],
         additionalProperties: false,
       },
     }),
     ApiOkResponse({
-      description: 'List position updated successfully.',
+      description: "List position updated successfully.",
       type: ListResponseDto,
     }),
-    ApiResponse({ status: 400, description: 'Invalid input data.' }),
-    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({ status: 400, description: "Invalid input data." }),
+    ApiResponse({ status: 401, description: "Unauthorized." }),
     ApiResponse({
       status: 403,
       description:
-        'Forbidden: current user is not a board member or lacks permission.',
+        "Forbidden: current user is not a board member or lacks permission.",
     }),
-    ApiResponse({ status: 404, description: 'Board or list not found.' }),
-    ApiBearerAuth('JWT'),
+    ApiResponse({ status: 404, description: "Board or list not found." }),
+    ApiBearerAuth("JWT"),
   );
 }
 
 export function ApiRemoveListDocs() {
   return applyDecorators(
-    ApiOperation({ summary: 'Delete a list' }),
+    ApiOperation({ summary: "Delete a list" }),
     ApiParam({
-      name: 'boardId',
+      name: "boardId",
       type: Number,
-      description: 'Target board id.',
+      description: "Target board id.",
     }),
     ApiParam({
-      name: 'listId',
+      name: "listId",
       type: Number,
-      description: 'Target list id.',
+      description: "Target list id.",
     }),
     ApiOkResponse({
-      description: 'List deleted successfully.',
+      description: "List deleted successfully.",
       type: ActionResponseDto,
     }),
-    ApiResponse({ status: 401, description: 'Unauthorized.' }),
+    ApiResponse({ status: 401, description: "Unauthorized." }),
     ApiResponse({
       status: 403,
       description:
-        'Forbidden: current user is not a board member or lacks permission.',
+        "Forbidden: current user is not a board member or lacks permission.",
     }),
-    ApiResponse({ status: 404, description: 'Board or list not found.' }),
-    ApiBearerAuth('JWT'),
+    ApiResponse({ status: 404, description: "Board or list not found." }),
+    ApiBearerAuth("JWT"),
   );
 }

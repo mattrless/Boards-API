@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { LoginUserResponseDto } from './respose-login-user.dto';
-import { Expose } from 'class-transformer';
+import { ApiProperty } from "@nestjs/swagger";
+import { LoginUserResponseDto } from "./respose-login-user.dto";
+import { Expose } from "class-transformer";
 
 export class LoginResponseDto {
   @ApiProperty({ type: LoginUserResponseDto })
@@ -8,7 +8,7 @@ export class LoginResponseDto {
   user: LoginUserResponseDto;
 
   @ApiProperty({
-    example: 'gfdhbGciOiJfdre1NiIsInR5cCI6IkpXVCJ9...',
+    example: "gfdhbGciOiJfdre1NiIsInR5cCI6IkpXVCJ9...",
   })
   @Expose()
   access_token: string;

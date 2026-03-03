@@ -6,10 +6,10 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
-} from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import type { Request } from 'express';
-import { AuthUser } from 'src/auth/types/auth-user.type';
+} from "@nestjs/common";
+import { PrismaService } from "src/prisma/prisma.service";
+import type { Request } from "express";
+import { AuthUser } from "src/auth/types/auth-user.type";
 
 @Injectable()
 export class EnsureBoardOwnershipGuard implements CanActivate {
@@ -20,12 +20,12 @@ export class EnsureBoardOwnershipGuard implements CanActivate {
     const user = request.user as AuthUser | undefined;
 
     if (!user?.id) {
-      throw new UnauthorizedException('User not authenticated');
+      throw new UnauthorizedException("User not authenticated");
     }
 
     const boardId = Number(request.params.id ?? request.params.boardId);
     if (!Number.isInteger(boardId)) {
-      throw new BadRequestException('Invalid board id');
+      throw new BadRequestException("Invalid board id");
     }
 
     const board = await this.prismaService.board.findFirst({
@@ -34,7 +34,7 @@ export class EnsureBoardOwnershipGuard implements CanActivate {
     });
 
     if (!board) {
-      throw new NotFoundException('Board not found');
+      throw new NotFoundException("Board not found");
     }
 
     if (board.ownerId !== user.id) {

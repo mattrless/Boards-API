@@ -1,12 +1,12 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { AsyncApi, AsyncApiSub } from 'nestjs-asyncapi';
-import { Injectable } from '@nestjs/common';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { AsyncApi, AsyncApiSub } from "nestjs-asyncapi";
+import { Injectable } from "@nestjs/common";
 
 class ListDataDto {
   @ApiProperty({ example: 10 })
   id: number;
 
-  @ApiProperty({ example: 'To Do' })
+  @ApiProperty({ example: "To Do" })
   title: string;
 
   @ApiProperty({ example: 1000 })
@@ -37,7 +37,7 @@ class ListCreatedUpdatedEventDto {
   @ApiProperty({ type: () => ListDataDto })
   data: ListDataDto;
 
-  @ApiProperty({ example: '2026-02-20T18:10:00.000Z' })
+  @ApiProperty({ example: "2026-02-20T18:10:00.000Z" })
   timestamp: string;
 }
 
@@ -51,7 +51,7 @@ class ListMovedEventDto {
   @ApiProperty({ type: () => ListMovedDataDto })
   data: ListMovedDataDto;
 
-  @ApiProperty({ example: '2026-02-20T18:10:00.000Z' })
+  @ApiProperty({ example: "2026-02-20T18:10:00.000Z" })
   timestamp: string;
 }
 
@@ -62,7 +62,7 @@ class ListDeletedEventDto {
   @ApiProperty({ example: 10 })
   listId: number;
 
-  @ApiProperty({ example: '2026-02-20T18:10:00.000Z' })
+  @ApiProperty({ example: "2026-02-20T18:10:00.000Z" })
   timestamp: string;
 }
 
@@ -70,25 +70,25 @@ class ListDeletedEventDto {
 @AsyncApi()
 export class ListsEventsAsyncApiContract {
   @AsyncApiSub({
-    channel: 'list:created',
+    channel: "list:created",
     message: { payload: ListCreatedUpdatedEventDto },
   })
   listCreated() {}
 
   @AsyncApiSub({
-    channel: 'list:updated',
+    channel: "list:updated",
     message: { payload: ListCreatedUpdatedEventDto },
   })
   listUpdated() {}
 
   @AsyncApiSub({
-    channel: 'list:moved',
+    channel: "list:moved",
     message: { payload: ListMovedEventDto },
   })
   listMoved() {}
 
   @AsyncApiSub({
-    channel: 'list:deleted',
+    channel: "list:deleted",
     message: { payload: ListDeletedEventDto },
   })
   listDeleted() {}

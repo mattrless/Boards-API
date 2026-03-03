@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException, PipeTransform } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { Injectable, NotFoundException, PipeTransform } from "@nestjs/common";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class BoardExistsPipe implements PipeTransform<number, Promise<number>> {
@@ -12,7 +12,7 @@ export class BoardExistsPipe implements PipeTransform<number, Promise<number>> {
     });
 
     if (!board) {
-      throw new NotFoundException('Board not found');
+      throw new NotFoundException("Board not found");
     }
 
     return id;
