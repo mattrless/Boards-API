@@ -38,16 +38,6 @@ export default function BoardsGrid() {
     );
   }
 
-  if (boardsQuery.data?.status === 403) {
-    return (
-      <div className="rounded-xl border border-dashed bg-card p-8">
-        <p className="text-sm text-muted-foreground">
-          You do not have permission to view boards.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
       <Tabs value={tab} onValueChange={(value) => setTab(value as BoardsTab)}>

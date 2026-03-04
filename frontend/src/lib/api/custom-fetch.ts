@@ -1,3 +1,20 @@
+import { HttpStatusError } from "@/lib/errors/http-status-error";
+
+function getHttpErrorMessage(status: number, data: unknown) {
+  if (
+    typeof data === "object" &&
+    data !== null &&
+    "message" in data &&
+    typeof data.message === "string"
+  ) {
+    return data.message;
+  }
+
+  if (status === 401) return "Unauthorized";
+  if (status === 403) return "Forbidden";
+  return `HTTP ${status}`;
+}
+
 export async function customFetch<T>(
   url: string,
   options?: RequestInit,
@@ -22,6 +39,13 @@ export async function customFetch<T>(
     } catch {
       data = bodyText;
     }
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    throw new HttpStatusError(
+      response.status,
+      getHttpErrorMessage(response.status, data),
+    );
   }
 
   return {

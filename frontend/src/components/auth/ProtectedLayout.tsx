@@ -6,9 +6,9 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { useMeQuery } from "@/hooks/auth/use-me-query";
 import { useLogoutMutation } from "@/hooks/auth/use-logout-mutation";
-import { AuthApiError } from "@/lib/api/auth.api";
 import { hasPermission } from "@/lib/auth/permissions";
 import type { UserResponseDto } from "@/lib/api/generated/boardsAPI.schemas";
+import { isHttpStatusError } from "@/lib/errors/http-status-error";
 
 type ProtectedLayoutRenderProps = {
   user: UserResponseDto;
@@ -36,7 +36,7 @@ export default function ProtectedLayout({
     !requiredPermission || hasPermission(meQuery.data, requiredPermission);
 
   useEffect(() => {
-    if (meQuery.error instanceof AuthApiError && meQuery.error.status === 401) {
+    if (isHttpStatusError(meQuery.error) && meQuery.error.status === 401) {
       router.replace("/");
     }
   }, [meQuery.error, router]);
@@ -62,7 +62,7 @@ export default function ProtectedLayout({
   }
 
   if (meQuery.isError) {
-    if (meQuery.error instanceof AuthApiError && meQuery.error.status === 401) {
+    if (isHttpStatusError(meQuery.error) && meQuery.error.status === 401) {
       return null;
     }
 
