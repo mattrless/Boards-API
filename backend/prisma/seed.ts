@@ -1,5 +1,5 @@
-import { PrismaClient, PermissionType } from '../generated/prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient, PermissionType } from "../generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({
@@ -9,83 +9,83 @@ const prisma = new PrismaClient({
 
 async function main() {
   await prisma.systemRole.createMany({
-    data: [{ name: 'admin' }, { name: 'user' }],
+    data: [{ name: "admin" }, { name: "user" }],
     skipDuplicates: true,
   });
 
   await prisma.boardRole.createMany({
-    data: [{ name: 'admin' }, { name: 'member' }],
+    data: [{ name: "admin" }, { name: "member" }],
     skipDuplicates: true,
   });
 
   await prisma.permission.createMany({
     data: [
       // USER – shared (admin + user)
-      { name: 'user_create', type: PermissionType.SYSTEM },
-      { name: 'user_read', type: PermissionType.SYSTEM },
-      { name: 'user_update_self', type: PermissionType.SYSTEM },
-      { name: 'user_delete_self', type: PermissionType.SYSTEM },
+      { name: "user_create", type: PermissionType.SYSTEM },
+      { name: "user_read", type: PermissionType.SYSTEM },
+      { name: "user_update_self", type: PermissionType.SYSTEM },
+      { name: "user_delete_self", type: PermissionType.SYSTEM },
 
       // BOARD
-      { name: 'board_create', type: PermissionType.SYSTEM },
-      { name: 'board_delete', type: PermissionType.SYSTEM },
-      { name: 'board_read', type: PermissionType.SYSTEM },
-      { name: 'board_update', type: PermissionType.SYSTEM },
-      { name: 'board_restore', type: PermissionType.SYSTEM },
+      { name: "board_create", type: PermissionType.SYSTEM },
+      { name: "board_delete", type: PermissionType.SYSTEM },
+      { name: "board_read", type: PermissionType.SYSTEM },
+      { name: "board_update", type: PermissionType.SYSTEM },
+      { name: "board_restore", type: PermissionType.SYSTEM },
 
-      { name: 'board_add_members', type: PermissionType.BOARD },
-      { name: 'board_remove_members', type: PermissionType.BOARD },
-      { name: 'board_update_member_role', type: PermissionType.BOARD },
-      { name: 'board_view_members', type: PermissionType.BOARD },
+      { name: "board_add_members", type: PermissionType.BOARD },
+      { name: "board_remove_members", type: PermissionType.BOARD },
+      { name: "board_update_member_role", type: PermissionType.BOARD },
+      { name: "board_view_members", type: PermissionType.BOARD },
 
       // LIST
-      { name: 'list_create', type: PermissionType.BOARD },
-      { name: 'list_read', type: PermissionType.BOARD },
-      { name: 'list_update', type: PermissionType.BOARD },
-      { name: 'list_delete', type: PermissionType.BOARD },
+      { name: "list_create", type: PermissionType.BOARD },
+      { name: "list_read", type: PermissionType.BOARD },
+      { name: "list_update", type: PermissionType.BOARD },
+      { name: "list_delete", type: PermissionType.BOARD },
 
       // CARDS
-      { name: 'card_create', type: PermissionType.BOARD },
-      { name: 'card_read', type: PermissionType.BOARD },
-      { name: 'card_update', type: PermissionType.BOARD },
-      { name: 'card_delete', type: PermissionType.BOARD },
+      { name: "card_create", type: PermissionType.BOARD },
+      { name: "card_read", type: PermissionType.BOARD },
+      { name: "card_update", type: PermissionType.BOARD },
+      { name: "card_delete", type: PermissionType.BOARD },
 
       // USER – admin only
-      { name: 'user_update_any', type: PermissionType.SYSTEM },
-      { name: 'user_delete_any', type: PermissionType.SYSTEM },
-      { name: 'user_restore', type: PermissionType.SYSTEM },
+      { name: "user_update_any", type: PermissionType.SYSTEM },
+      { name: "user_delete_any", type: PermissionType.SYSTEM },
+      { name: "user_restore", type: PermissionType.SYSTEM },
     ],
     skipDuplicates: true,
   });
 
   const adminRole = await prisma.systemRole.findUnique({
-    where: { name: 'admin' },
+    where: { name: "admin" },
   });
 
   const userRole = await prisma.systemRole.findUnique({
-    where: { name: 'user' },
+    where: { name: "user" },
   });
 
   if (!adminRole || !userRole) {
-    throw new Error('System roles not found');
+    throw new Error("System roles not found");
   }
 
   const adminPermissions = await prisma.permission.findMany({
     where: {
       name: {
         in: [
-          'user_create',
-          'user_read',
-          'user_update_self',
-          'user_delete_self',
-          'user_update_any',
-          'user_delete_any',
-          'user_restore',
-          'board_create',
-          'board_delete',
-          'board_read',
-          'board_update',
-          'board_restore',
+          "user_create",
+          "user_read",
+          "user_update_self",
+          "user_delete_self",
+          "user_update_any",
+          "user_delete_any",
+          "user_restore",
+          "board_create",
+          "board_delete",
+          "board_read",
+          "board_update",
+          "board_restore",
         ],
       },
     },
@@ -95,15 +95,14 @@ async function main() {
     where: {
       name: {
         in: [
-          'user_create',
-          'user_read',
-          'user_update_self',
-          'user_delete_self',
-          'board_create',
-          'board_delete',
-          'board_read',
-          'board_update',
-          'board_restore',
+          "user_read",
+          "user_update_self",
+          "user_delete_self",
+          "board_create",
+          "board_delete",
+          "board_read",
+          "board_update",
+          "board_restore",
         ],
       },
     },
@@ -126,33 +125,33 @@ async function main() {
   });
 
   const adminBoardRole = await prisma.boardRole.findUnique({
-    where: { name: 'admin' },
+    where: { name: "admin" },
   });
 
   const memberBoardRole = await prisma.boardRole.findUnique({
-    where: { name: 'member' },
+    where: { name: "member" },
   });
 
   if (!adminBoardRole || !memberBoardRole) {
-    throw new Error('Board roles not found');
+    throw new Error("Board roles not found");
   }
 
   const adminBoardPermissions = await prisma.permission.findMany({
     where: {
       name: {
         in: [
-          'board_add_members',
-          'board_remove_members',
-          'board_update_member_role',
-          'board_view_members',
-          'list_create',
-          'list_read',
-          'list_update',
-          'list_delete',
-          'card_create',
-          'card_read',
-          'card_update',
-          'card_delete',
+          "board_add_members",
+          "board_remove_members",
+          "board_update_member_role",
+          "board_view_members",
+          "list_create",
+          "list_read",
+          "list_update",
+          "list_delete",
+          "card_create",
+          "card_read",
+          "card_update",
+          "card_delete",
         ],
       },
       type: PermissionType.BOARD,
@@ -163,12 +162,12 @@ async function main() {
     where: {
       name: {
         in: [
-          'board_view_members',
-          'list_read',
-          'card_create',
-          'card_read',
-          'card_update',
-          'card_delete',
+          "board_view_members",
+          "list_read",
+          "card_create",
+          "card_read",
+          "card_update",
+          "card_delete",
         ],
       },
       type: PermissionType.BOARD,
@@ -195,30 +194,34 @@ async function main() {
     where: { id: 1 },
     update: {},
     create: {
-      name: 'Admin',
+      name: "Admin",
       avatar: null,
     },
   });
 
   await prisma.user.upsert({
-    where: { email: 'admin@local.dev' },
+    where: { email: "admin@local.dev" },
     update: {},
     create: {
-      email: 'admin@local.dev',
-      password: '$2b$10$DL6xGPf3TGlomFl.yV5tt.b1MNiNHl6SBWLH3gdzU/E59Ary3YOji',
+      email: "admin@local.dev",
+      password: "$2b$10$DL6xGPf3TGlomFl.yV5tt.b1MNiNHl6SBWLH3gdzU/E59Ary3YOji",
       profileId: adminProfile.id,
       systemRoleId: adminRole.id,
     },
   });
 
-  console.log('Seeding finished');
+  console.log("Seeding finished");
 }
 
-main()
-  .catch((error) => {
-    console.error('❌ Seeding failed', error);
-    process.exit(1);
-  })
-  .finally(async () => {
+async function runSeed() {
+  try {
+    await main();
+  } catch (error) {
+    console.error("❌ Seeding failed", error);
+    process.exitCode = 1;
+  } finally {
     await prisma.$disconnect();
-  });
+  }
+}
+
+void runSeed();
