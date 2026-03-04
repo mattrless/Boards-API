@@ -12,15 +12,11 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
-import { AuthApiError } from "@/lib/api/auth.api";
+import { getAuthApiErrorMessage } from "@/lib/errors/api-error";
 import { useLoginMutation } from "@/hooks/auth/use-login-mutation";
 import loginSchema, { type LoginSchema } from "@/lib/schemas/auth/login.schema";
-
-function getLoginErrorMessage(error: unknown) {
-  if (error instanceof AuthApiError) return error.message;
-  return "Something went wrong. Please try again.";
-}
 
 export default function LoginForm() {
   const router = useRouter();
@@ -40,6 +36,7 @@ export default function LoginForm() {
     loginMutation.mutate(data, {
       onSuccess: () => {
         queryClient.removeQueries({ queryKey: ["auth", "me"] });
+        toast.success("Welcome back!");
         router.push("/boards");
       },
     });
@@ -99,7 +96,7 @@ export default function LoginForm() {
           {loginMutation.isPending ? "Logging in..." : "Login"}
         </Button>
         {loginMutation.isError && (
-          <FieldError>{getLoginErrorMessage(loginMutation.error)}</FieldError>
+          <FieldError>{getAuthApiErrorMessage(loginMutation.error)}</FieldError>
         )}
       </FieldGroup>
     </form>

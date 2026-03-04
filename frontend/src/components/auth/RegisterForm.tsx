@@ -12,18 +12,14 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
-import { AuthApiError } from "@/lib/api/auth.api";
+import { getAuthApiErrorMessage } from "@/lib/errors/api-error";
 import { useRegisterMutation } from "@/hooks/auth/use-register-mutation";
 import { useLoginMutation } from "@/hooks/auth/use-login-mutation";
 import registerSchema, {
   type RegisterSchema,
 } from "@/lib/schemas/auth/register.schema";
-
-function getRegisterErrorMessage(error: unknown) {
-  if (error instanceof AuthApiError) return error.message;
-  return "Something went wrong. Please try again.";
-}
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -53,6 +49,7 @@ export default function RegisterForm() {
           {
             onSuccess: () => {
               queryClient.removeQueries({ queryKey: ["auth", "me"] });
+              toast.success("Account created successfully!");
               router.push("/boards");
             },
           },
@@ -174,7 +171,7 @@ export default function RegisterForm() {
             : "Create account"}
         </Button>
         {registerMutation.isError && (
-          <FieldError>{getRegisterErrorMessage(registerMutation.error)}</FieldError>
+          <FieldError>{getAuthApiErrorMessage(registerMutation.error)}</FieldError>
         )}
         {loginMutation.isError && (
           <FieldError>

@@ -1,6 +1,7 @@
 import { applyDecorators } from "@nestjs/common";
 import {
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -15,7 +16,7 @@ import { MyBoardResponseDto } from "../dto/my-board-response.dto";
 export function ApiCreateBoardDocs() {
   return applyDecorators(
     ApiOperation({ summary: "Create board" }),
-    ApiOkResponse({
+    ApiCreatedResponse({
       description: "The board has been successfully created.",
       type: BoardResponseDto,
     }),
