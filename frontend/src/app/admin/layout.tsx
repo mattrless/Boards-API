@@ -6,20 +6,18 @@ import { usePathname } from "next/navigation";
 import ProtectedLayout from "@/components/auth/ProtectedLayout";
 import WorkspaceHeader from "@/components/layout/WorkspaceHeader";
 import { Button } from "@/components/ui/button";
-import { hasPermission } from "@/lib/auth/permissions";
 
-export default function BoardsLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const title = getBoardsTitle(pathname);
+  const title = getAdminTitle(pathname);
 
   return (
-    // ProtectedLayout returns user, isLoggingOut and logout. To prevent duplication in each layout
     <ProtectedLayout
-      requiredPermission="board_read"
+      requiredPermission="user_create"
       forbiddenRedirectTo="/forbidden"
     >
       {({ user, isLoggingOut, logout }) => (
@@ -31,11 +29,9 @@ export default function BoardsLayout({
               isLoggingOut={isLoggingOut}
               onLogout={logout}
               actions={
-                hasPermission(user, "user_create") ? (
-                  <Button asChild variant="secondary">
-                    <Link href="/admin/users">Users</Link>
-                  </Button>
-                ) : null
+                <Button asChild variant="secondary">
+                  <Link href="/boards">Boards</Link>
+                </Button>
               }
             />
             {children}
@@ -46,8 +42,7 @@ export default function BoardsLayout({
   );
 }
 
-function getBoardsTitle(pathname: string) {
-  if (pathname === "/boards") return "My Boards";
-  if (pathname.startsWith("/boards/")) return "Board Details";
-  return "Boards";
+function getAdminTitle(pathname: string) {
+  if (pathname === "/admin/users") return "Users Management";
+  return "Admin";
 }
