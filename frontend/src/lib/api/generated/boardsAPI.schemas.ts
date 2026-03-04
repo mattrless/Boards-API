@@ -45,6 +45,8 @@ export interface UserResponseDto {
   updatedAt: string;
   profile: ProfileResponseDto;
   systemRole: SystemRoleResponseDto;
+  /** Effective permissions granted by the user's system role. */
+  permissions: string[];
 }
 
 export interface UpdateProfileDto {

@@ -15,6 +15,27 @@ import { UserResponseDto } from "./dto/user-response.dto";
 import { ActionResponseDto } from "./dto/action-response.dto";
 import { AdminUpdateUserDto } from "./dto/admin-update-user.dto";
 
+const userResponseInclude = {
+  profile: true,
+  systemRole: {
+    include: {
+      systemRoleSystemPermissions: {
+        include: {
+          permission: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  },
+} satisfies Prisma.UserInclude;
+
+type UserWithPermissions = Prisma.UserGetPayload<{
+  include: typeof userResponseInclude;
+}>;
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -42,12 +63,10 @@ export class UsersService {
             },
           },
         },
-        include: { profile: true, systemRole: true },
+        include: userResponseInclude,
       });
 
-      return plainToInstance(UserResponseDto, user, {
-        excludeExtraneousValues: true,
-      });
+      return this.toUserResponse(user);
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -63,12 +82,10 @@ export class UsersService {
     try {
       const users = await this.prismaService.user.findMany({
         where: { deletedAt: null },
-        include: { profile: true, systemRole: true },
+        include: userResponseInclude,
       });
 
-      return plainToInstance(UserResponseDto, users, {
-        excludeExtraneousValues: true,
-      });
+      return this.toUserResponseList(users);
     } catch {
       throw new InternalServerErrorException("Failed to fetch users");
     }
@@ -77,37 +94,27 @@ export class UsersService {
   async findOne(id: number) {
     const user = await this.prismaService.user.findFirst({
       where: { id, deletedAt: null },
-      include: {
-        profile: true,
-        systemRole: true,
-      },
+      include: userResponseInclude,
     });
 
     if (!user) {
       throw new NotFoundException(`User not found`);
     }
 
-    return plainToInstance(UserResponseDto, user, {
-      excludeExtraneousValues: true,
-    });
+    return this.toUserResponse(user);
   }
 
   async findMe(userId: number) {
     const user = await this.prismaService.user.findFirst({
       where: { id: userId, deletedAt: null },
-      include: {
-        profile: true,
-        systemRole: true,
-      },
+      include: userResponseInclude,
     });
 
     if (!user) {
       throw new NotFoundException("Authenticated user not found");
     }
 
-    return plainToInstance(UserResponseDto, user, {
-      excludeExtraneousValues: true,
-    });
+    return this.toUserResponse(user);
   }
 
   async updateSelf(userId: number, updateUserDto: UpdateUserDto) {
@@ -130,12 +137,10 @@ export class UsersService {
       const user = await this.prismaService.user.update({
         where: { id: userId },
         data,
-        include: { profile: true, systemRole: true },
+        include: userResponseInclude,
       });
 
-      return plainToInstance(UserResponseDto, user, {
-        excludeExtraneousValues: true,
-      });
+      return this.toUserResponse(user);
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -170,12 +175,10 @@ export class UsersService {
       const user = await this.prismaService.user.update({
         where: { id: userId },
         data,
-        include: { profile: true, systemRole: true },
+        include: userResponseInclude,
       });
 
-      return plainToInstance(UserResponseDto, user, {
-        excludeExtraneousValues: true,
-      });
+      return this.toUserResponse(user);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         switch (error.code) {
@@ -296,5 +299,21 @@ export class UsersService {
     const rounds = Number(this.config.get("BCRYPT_SALT_ROUNDS")) || 10;
     const hashedPassword = await bcrypt.hash(password, rounds);
     return hashedPassword;
+  }
+
+  private toUserResponse(user: UserWithPermissions): UserResponseDto {
+    const permissions = user.systemRole.systemRoleSystemPermissions.map(
+      (rolePermission) => rolePermission.permission.name,
+    );
+
+    return plainToInstance(
+      UserResponseDto,
+      { ...user, permissions },
+      { excludeExtraneousValues: true },
+    );
+  }
+
+  private toUserResponseList(users: UserWithPermissions[]): UserResponseDto[] {
+    return users.map((user) => this.toUserResponse(user));
   }
 }

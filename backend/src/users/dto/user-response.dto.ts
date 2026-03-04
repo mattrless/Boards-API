@@ -59,4 +59,12 @@ export class UserResponseDto {
   @Expose()
   @Type(() => SystemRoleResponseDto)
   systemRole: SystemRoleResponseDto;
+
+  @ApiProperty({
+    type: [String],
+    example: ["user_read", "board_read", "board_create"],
+    description: "Effective permissions granted by the user's system role.",
+  })
+  @Expose()
+  permissions: string[];
 }
