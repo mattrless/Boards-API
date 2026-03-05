@@ -28,6 +28,8 @@ type WsSocket = Socket<
   SocketData
 >;
 
+const AUTH_TOKEN_COOKIE_NAME = "token";
+
 @WebSocketGateway({
   cors: { origin: "*" },
 })
@@ -55,15 +57,33 @@ export class BoardGateway
   private extractToken(client: WsSocket): string | null {
     const authorization = client.handshake.headers.authorization;
     if (!authorization) {
-      return null;
+      return this.extractTokenFromCookie(client);
     }
 
     const [type, token] = authorization.split(" ");
     if (type !== "Bearer" || !token) {
-      return null;
+      return this.extractTokenFromCookie(client);
     }
 
     return token;
+  }
+
+  private extractTokenFromCookie(client: WsSocket): string | null {
+    const rawCookieHeader = client.handshake.headers.cookie;
+    if (!rawCookieHeader) {
+      return null;
+    }
+
+    const cookiePairs = rawCookieHeader.split(";");
+    for (const cookiePair of cookiePairs) {
+      const [name, ...valueParts] = cookiePair.trim().split("=");
+      if (name !== AUTH_TOKEN_COOKIE_NAME) continue;
+      const rawValue = valueParts.join("=");
+      if (!rawValue) return null;
+      return decodeURIComponent(rawValue);
+    }
+
+    return null;
   }
 
   async handleConnection(client: WsSocket) {
