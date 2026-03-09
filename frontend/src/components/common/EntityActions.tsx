@@ -27,19 +27,21 @@ import {
 } from "@/components/ui/tooltip";
 import { useState } from "react";
 
-type BoardQuickActionsProps = {
-  boardName: string;
+type EntityActionsProps = {
+  entityLabel: string;
+  entityName: string;
   disabled?: boolean;
-  onEditName: () => void;
-  onDeleteBoard: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 };
 
-export default function BoardQuickActions({
-  boardName,
+export default function EntityActions({
+  entityLabel,
+  entityName,
   disabled = false,
-  onEditName,
-  onDeleteBoard,
-}: BoardQuickActionsProps) {
+  onEdit,
+  onDelete,
+}: EntityActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   function openDeleteDialog() {
@@ -51,7 +53,7 @@ export default function BoardQuickActions({
   }
 
   function handleDelete() {
-    onDeleteBoard();
+    onDelete();
     closeDeleteDialog();
   }
 
@@ -66,7 +68,7 @@ export default function BoardQuickActions({
                   type="button"
                   variant="ghost"
                   size="icon-xs"
-                  aria-label="Board actions"
+                  aria-label={`${entityLabel} actions`}
                   disabled={disabled}
                 >
                   <MoreHorizontal className="h-4 w-4" />
@@ -74,9 +76,9 @@ export default function BoardQuickActions({
               </DropdownMenuTrigger>
             </TooltipTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem disabled={disabled} onSelect={onEditName}>
+              <DropdownMenuItem disabled={disabled} onSelect={onEdit}>
                 <Pencil className="h-4 w-4" />
-                Edit name
+                Rename
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
@@ -87,7 +89,7 @@ export default function BoardQuickActions({
                 }}
               >
                 <Trash2 className="h-4 w-4" />
-                Delete board
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -95,16 +97,21 @@ export default function BoardQuickActions({
         </Tooltip>
       </TooltipProvider>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete board?</AlertDialogTitle>
+            <AlertDialogTitle>{`Delete ${entityLabel}?`}</AlertDialogTitle>
             <AlertDialogDescription>
-              You are deleting "{boardName}". This action cannot be undone.
+              You are deleting "{entityName}". This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={closeDeleteDialog}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={closeDeleteDialog}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               disabled={disabled}

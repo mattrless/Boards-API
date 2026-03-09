@@ -24,6 +24,7 @@ import type {
 import type {
   ActionResponseDto,
   BoardDetailsResponseDto,
+  BoardMyPermissionsResponseDto,
   BoardOwnerResponseDto,
   BoardResponseDto,
   CreateBoardDto,
@@ -512,6 +513,220 @@ export function useBoardsControllerFindMyBoards<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getBoardsControllerFindMyBoardsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get current user effective permissions for a specific board
+ */
+export type boardsControllerFindMyBoardPermissionsResponse200 = {
+  data: BoardMyPermissionsResponseDto;
+  status: 200;
+};
+
+export type boardsControllerFindMyBoardPermissionsResponse403 = {
+  data: void;
+  status: 403;
+};
+
+export type boardsControllerFindMyBoardPermissionsResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type boardsControllerFindMyBoardPermissionsResponseSuccess =
+  boardsControllerFindMyBoardPermissionsResponse200 & {
+    headers: Headers;
+  };
+export type boardsControllerFindMyBoardPermissionsResponseError = (
+  | boardsControllerFindMyBoardPermissionsResponse403
+  | boardsControllerFindMyBoardPermissionsResponse404
+) & {
+  headers: Headers;
+};
+
+export type boardsControllerFindMyBoardPermissionsResponse =
+  | boardsControllerFindMyBoardPermissionsResponseSuccess
+  | boardsControllerFindMyBoardPermissionsResponseError;
+
+export const getBoardsControllerFindMyBoardPermissionsUrl = (
+  boardId: number,
+) => {
+  return `/boards/${boardId}/my-permissions`;
+};
+
+export const boardsControllerFindMyBoardPermissions = async (
+  boardId: number,
+  options?: RequestInit,
+): Promise<boardsControllerFindMyBoardPermissionsResponse> => {
+  return customFetch<boardsControllerFindMyBoardPermissionsResponse>(
+    getBoardsControllerFindMyBoardPermissionsUrl(boardId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getBoardsControllerFindMyBoardPermissionsQueryKey = (
+  boardId: number,
+) => {
+  return [`/boards/${boardId}/my-permissions`] as const;
+};
+
+export const getBoardsControllerFindMyBoardPermissionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+  TError = void,
+>(
+  boardId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getBoardsControllerFindMyBoardPermissionsQueryKey(boardId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>
+  > = ({ signal }) =>
+    boardsControllerFindMyBoardPermissions(boardId, {
+      signal,
+      ...requestOptions,
+    });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!boardId,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type BoardsControllerFindMyBoardPermissionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>
+>;
+export type BoardsControllerFindMyBoardPermissionsQueryError = void;
+
+export function useBoardsControllerFindMyBoardPermissions<
+  TData = Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+  TError = void,
+>(
+  boardId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+          TError,
+          Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useBoardsControllerFindMyBoardPermissions<
+  TData = Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+  TError = void,
+>(
+  boardId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+          TError,
+          Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useBoardsControllerFindMyBoardPermissions<
+  TData = Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+  TError = void,
+>(
+  boardId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get current user effective permissions for a specific board
+ */
+
+export function useBoardsControllerFindMyBoardPermissions<
+  TData = Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+  TError = void,
+>(
+  boardId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof boardsControllerFindMyBoardPermissions>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getBoardsControllerFindMyBoardPermissionsQueryOptions(
+    boardId,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

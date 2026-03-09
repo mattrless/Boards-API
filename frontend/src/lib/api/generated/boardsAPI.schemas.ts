@@ -134,6 +134,17 @@ export interface MyBoardResponseDto {
   isOwner: boolean;
 }
 
+export interface BoardMyPermissionsResponseDto {
+  /** Target board id. */
+  boardId: number;
+  /** Current user board role name. For system admins outside membership, this can be "system_admin". */
+  boardRole?: string;
+  /** Indicates whether the current user owns this board. */
+  isOwner: boolean;
+  /** Effective board-scoped permissions for this board context. */
+  permissions: string[];
+}
+
 export interface UserSummaryProfileResponseDto {
   name: string;
   avatar?: string;
