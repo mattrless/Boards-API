@@ -6,6 +6,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiCreatedResponse,
 } from "@nestjs/swagger";
 import { CardResponseDto } from "../dto/card-response.dto";
 import { CardSummaryResponseDto } from "../dto/card-summary-response.dto";
@@ -24,7 +25,7 @@ export function ApiCreateCardDocs() {
       type: Number,
       description: "Target list id.",
     }),
-    ApiOkResponse({
+    ApiCreatedResponse({
       description: "Card created successfully.",
       type: CardResponseDto,
     }),

@@ -37,9 +37,9 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary Create a new card in a list
  */
-export type cardsControllerCreateResponse200 = {
+export type cardsControllerCreateResponse201 = {
   data: CardResponseDto;
-  status: 200;
+  status: 201;
 };
 
 export type cardsControllerCreateResponse400 = {
@@ -63,7 +63,7 @@ export type cardsControllerCreateResponse404 = {
 };
 
 export type cardsControllerCreateResponseSuccess =
-  cardsControllerCreateResponse200 & {
+  cardsControllerCreateResponse201 & {
     headers: Headers;
   };
 export type cardsControllerCreateResponseError = (

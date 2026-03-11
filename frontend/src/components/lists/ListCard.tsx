@@ -12,7 +12,10 @@ import {
 } from "@/lib/api/generated/boardsAPI.schemas";
 import { useBoardsControllerFindMyBoardPermissions } from "@/lib/api/generated/boards/boards";
 import { useBoardIdParam } from "@/hooks/boards/use-board-id-param";
-import { hasAllBoardPermissions } from "@/lib/auth/board-permissions";
+import {
+  hasAllBoardPermissions,
+  hasBoardPermission,
+} from "@/lib/auth/board-permissions";
 import EntityActions from "../common/EntityActions";
 import { useState } from "react";
 import { useRemoveListMutation } from "@/hooks/lists/use-remove-list-mutation";
@@ -22,7 +25,7 @@ import { useSortable } from "@dnd-kit/react/sortable";
 import { cn } from "@/lib/utils";
 import { useCardsControllerFindAll } from "@/lib/api/generated/cards/cards";
 import CardItem from "../cards/CardItem";
-import { Button } from "../ui/button";
+import CreateCardButton from "../cards/CreateCardButton";
 
 export default function ListCard({
   list,
@@ -101,7 +104,7 @@ export default function ListCard({
     <div ref={ref}>
       <Card
         className={cn(
-          "w-72 shrink-0 self-start overflow-hidden gap-0 py-4 max-h-[calc(100dvh-9rem)]",
+          "w-72 shrink-0 self-start overflow-hidden gap-0 pt-4 pb-2 max-h-[calc(100dvh-9rem)]",
           isDragging && "opacity-70",
         )}
       >
@@ -144,9 +147,11 @@ export default function ListCard({
           </CardContent>
         ) : null}
 
-        {/* <CardFooter className="bg-amber-200">
-          <Button>Test</Button>
-        </CardFooter> */}
+        {hasBoardPermission(userBoardPermissions, "card_create") ? (
+          <CardFooter className="pt-2 px-4">
+            <CreateCardButton boardId={boardId} listId={list.id} />
+          </CardFooter>
+        ) : null}
       </Card>
     </div>
   );

@@ -8,62 +8,65 @@ import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import createListSchema, {
-  CreateListSchema,
-} from "@/lib/schemas/lists/create-list.schema";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  getListsControllerFindAllQueryKey,
-  useListsControllerCreate,
-} from "@/lib/api/generated/lists/lists";
-import { useBoardIdParam } from "@/hooks/boards/use-board-id-param";
 import { toast } from "sonner";
 import { getErrorMessageByStatus } from "@/lib/errors/api-error";
+import {
+  getCardsControllerFindAllQueryKey,
+  useCardsControllerCreate,
+} from "@/lib/api/generated/cards/cards";
+import createCardSchema, {
+  CreateCardSchema,
+} from "@/lib/schemas/cards/create-card.schema";
 
-type CreateListFormProps = {
+type CreateCardFormProps = {
+  boardId: number;
+  listId: number;
   onSuccess?: () => void;
   onCancel?: () => void;
 };
 
-export default function CreateListForm({
+export default function CreateCardForm({
+  boardId,
+  listId,
   onSuccess,
   onCancel,
-}: CreateListFormProps) {
+}: CreateCardFormProps) {
   const queryClient = useQueryClient();
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const createListMutation = useListsControllerCreate();
-  const boardId = useBoardIdParam();
+  const createCardMutation = useCardsControllerCreate();
 
-  const form = useForm<CreateListSchema>({
-    resolver: zodResolver(createListSchema),
+  const form = useForm<CreateCardSchema>({
+    resolver: zodResolver(createCardSchema),
     defaultValues: {
       title: "",
     },
   });
 
-  function onSubmit(data: CreateListSchema) {
+  function onSubmit(data: CreateCardSchema) {
     setSubmitError(null);
-    createListMutation.mutate(
+    createCardMutation.mutate(
       {
         boardId,
+        listId,
         data: { title: data.title },
       },
       {
         onSuccess: (res) => {
           if (res.status === 201) {
             queryClient.invalidateQueries({
-              queryKey: getListsControllerFindAllQueryKey(boardId),
+              queryKey: getCardsControllerFindAllQueryKey(boardId, listId),
             });
             form.reset();
-            toast.success("List created.");
+            toast.success("Card created.");
             onSuccess?.();
             return;
           }
           setSubmitError(
             getErrorMessageByStatus(res.status, {
-              400: "Invalid list data.",
-              403: "You do not have permission to create lists.",
+              400: "Invalid data.",
+              403: "You do not have permission to create cards.",
             }),
           );
         },
@@ -92,7 +95,7 @@ export default function CreateListForm({
                   aria-invalid={fieldState.invalid}
                   maxLength={50}
                   autoFocus
-                  placeholder="My awesome list"
+                  placeholder="My awesome card"
                   autoComplete="off"
                   className="h-8 text-base font-semibold"
                 />
