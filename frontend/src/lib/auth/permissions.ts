@@ -6,3 +6,10 @@ export function hasPermission(
 ) {
   return user?.permissions?.includes(permission) ?? false;
 }
+
+export function hasAnyPermission(
+  user: UserResponseDto | undefined,
+  required: string[],
+) {
+  return required.some((p) => user?.permissions?.includes(p));
+}

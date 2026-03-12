@@ -7,6 +7,7 @@ import { usersControllerCreate } from "@/lib/api/generated/users/users";
 import type { RegisterSchema } from "@/lib/schemas/auth/register.schema";
 
 export function useRegisterMutation() {
+  const defaultAvatar = process.env.NEXT_PUBLIC_DEFAULT_AVATAR;
   return useMutation({
     mutationKey: ["auth", "register"],
     mutationFn: async (data: RegisterSchema) => {
@@ -16,7 +17,9 @@ export function useRegisterMutation() {
           password: data.password,
           profile: {
             name: data.name,
-            ...(data.avatar ? { avatar: data.avatar } : {}),
+            ...(data.avatar
+              ? { avatar: data.avatar }
+              : { avatar: defaultAvatar }),
           },
         },
         {

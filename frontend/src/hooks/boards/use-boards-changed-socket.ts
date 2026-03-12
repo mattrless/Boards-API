@@ -3,7 +3,11 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { io } from "socket.io-client";
-import { getBoardsControllerFindMyBoardsQueryKey } from "@/lib/api/generated/boards/boards";
+import {
+  getBoardsControllerFindMyBoardPermissionsQueryKey,
+  getBoardsControllerFindMyBoardsQueryKey,
+} from "@/lib/api/generated/boards/boards";
+import { BoardChangedEvent } from "@/lib/types/board-events";
 
 export function useBoardsChangedSocket() {
   const queryClient = useQueryClient();
@@ -21,15 +25,22 @@ export function useBoardsChangedSocket() {
       socket.emit("user:join");
     });
 
-    socket.on("boards:changed", () => {
+    const invalidateBoards = async (payload: BoardChangedEvent) => {
       queryClient.invalidateQueries({
         queryKey: getBoardsControllerFindMyBoardsQueryKey(),
       });
-    });
+      queryClient.invalidateQueries({
+        queryKey: getBoardsControllerFindMyBoardPermissionsQueryKey(
+          payload.boardId,
+        ),
+      });
+    };
+
+    socket.on("boards:changed", invalidateBoards);
 
     return () => {
       socket.off("connect");
-      socket.off("boards:changed");
+      socket.off("boards:changed", invalidateBoards);
       socket.disconnect();
     };
   }, [queryClient]);

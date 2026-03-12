@@ -31,6 +31,8 @@ type EntityActionsProps = {
   entityLabel: string;
   entityName: string;
   disabled?: boolean;
+  canRenameBoard?: boolean;
+  canDeleteBoard?: boolean;
   onEdit: () => void;
   onDelete: () => void;
 };
@@ -41,9 +43,14 @@ export default function EntityActions({
   disabled = false,
   onEdit,
   onDelete,
+  canRenameBoard = false,
+  canDeleteBoard = false,
 }: EntityActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
+  const isBoards = entityLabel === "Board";
+  const showRename = isBoards ? canRenameBoard : true;
+  const showDelete = isBoards ? canDeleteBoard : true;
+  console.log(showDelete);
   function openDeleteDialog() {
     setIsDeleteDialogOpen(true);
   }
@@ -76,21 +83,25 @@ export default function EntityActions({
               </DropdownMenuTrigger>
             </TooltipTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem disabled={disabled} onSelect={onEdit}>
-                <Pencil className="h-4 w-4" />
-                Rename
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                variant="destructive"
-                disabled={disabled}
-                onSelect={(event) => {
-                  event.preventDefault();
-                  openDeleteDialog();
-                }}
-              >
-                <Trash2 className="h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
+              {showRename ? (
+                <DropdownMenuItem disabled={disabled} onSelect={onEdit}>
+                  <Pencil className="h-4 w-4" />
+                  Rename
+                </DropdownMenuItem>
+              ) : null}
+              {showDelete ? (
+                <DropdownMenuItem
+                  variant="destructive"
+                  disabled={disabled}
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    openDeleteDialog();
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              ) : null}
             </DropdownMenuContent>
           </DropdownMenu>
           <TooltipContent side="top">Quick actions</TooltipContent>
@@ -105,9 +116,8 @@ export default function EntityActions({
           <AlertDialogHeader>
             <AlertDialogTitle>{`Delete ${entityLabel}?`}</AlertDialogTitle>
             <AlertDialogDescription className="max-w-full whitespace-normal">
-              You are deleting{" "}
-              <span className="break-all">"{entityName}"</span>. This action
-              cannot be undone.
+              You are deleting <span className="break-all">"{entityName}"</span>
+              . This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

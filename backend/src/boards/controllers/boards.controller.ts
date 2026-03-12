@@ -86,7 +86,7 @@ export class BoardsController {
   }
 
   @ApiUpdateBoardDocs()
-  @UseGuards(AuthGuard("jwt"), PermissionsGuard)
+  @UseGuards(AuthGuard("jwt"), BoardPermissionsGuard)
   @Permissions("board_update")
   @Put(":boardId")
   update(
@@ -97,7 +97,7 @@ export class BoardsController {
   }
 
   @ApiRemoveBoardDocs()
-  @UseGuards(AuthGuard("jwt"), PermissionsGuard, EnsureBoardOwnershipGuard)
+  @UseGuards(AuthGuard("jwt"), BoardPermissionsGuard, EnsureBoardOwnershipGuard)
   @Permissions("board_delete")
   @Delete(":boardId")
   remove(@Param("boardId", ParseIntPipe) boardId: number) {

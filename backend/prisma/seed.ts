@@ -28,9 +28,9 @@ async function main() {
 
       // BOARD
       { name: "board_create", type: PermissionType.SYSTEM },
-      { name: "board_delete", type: PermissionType.SYSTEM },
+      { name: "board_delete", type: PermissionType.BOARD },
       { name: "board_read", type: PermissionType.SYSTEM },
-      { name: "board_update", type: PermissionType.SYSTEM },
+      { name: "board_update", type: PermissionType.BOARD },
       { name: "board_restore", type: PermissionType.SYSTEM },
 
       { name: "board_read_full_board", type: PermissionType.BOARD },
@@ -83,9 +83,7 @@ async function main() {
           "user_delete_any",
           "user_restore",
           "board_create",
-          "board_delete",
           "board_read",
-          "board_update",
           "board_restore",
         ],
       },
@@ -100,9 +98,7 @@ async function main() {
           "user_update_self",
           "user_delete_self",
           "board_create",
-          "board_delete",
           "board_read",
-          "board_update",
           "board_restore",
         ],
       },
@@ -141,6 +137,8 @@ async function main() {
     where: {
       name: {
         in: [
+          "board_update",
+          "board_delete",
           "board_read_full_board",
           "board_add_members",
           "board_remove_members",

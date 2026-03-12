@@ -34,7 +34,6 @@ export default function WorkspaceHeader({
         <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           {userName}'s Workspace
         </p>
-        {/* <h1 className="text-3xl font-semibold tracking-tight">{title}</h1> */}
 
         <Breadcrumb>
           <BreadcrumbList className="text-xl font-semibold tracking-tight text-foreground md:text-2xl lg:text-3xl">

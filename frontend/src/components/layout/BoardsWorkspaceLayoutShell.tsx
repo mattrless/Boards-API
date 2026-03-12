@@ -33,11 +33,13 @@ export default function BoardsWorkspaceLayoutShell({
               isLoggingOut={isLoggingOut}
               onLogout={logout}
               actions={
-                hasPermission(user, "user_create") ? (
-                  <Button asChild variant="secondary">
-                    <Link href="/admin/users">Users</Link>
-                  </Button>
-                ) : null
+                <div>
+                  {hasPermission(user, "user_create") ? (
+                    <Button asChild variant="secondary">
+                      <Link href="/admin/users">Users</Link>
+                    </Button>
+                  ) : null}
+                </div>
               }
             />
             {children}

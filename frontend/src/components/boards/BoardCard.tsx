@@ -17,6 +17,11 @@ import { cn } from "@/lib/utils";
 import EntityActions from "../common/EntityActions";
 import { useRemoveBoardMutation } from "@/hooks/boards/use-remove-board-mutation";
 import { useUpdateBoardMutation } from "@/hooks/boards/use-update-board-mutation";
+import {
+  hasAnyBoardPermission,
+  hasBoardPermission,
+} from "@/lib/auth/board-permissions";
+import { useBoardsControllerFindMyBoardPermissions } from "@/lib/api/generated/boards/boards";
 
 type BoardCardProps = {
   board: MyBoardResponseDto;
@@ -38,6 +43,21 @@ export default function BoardCard({ board }: BoardCardProps) {
   const updatedDate = new Date(board.updatedAt).toLocaleString();
   const isMutating =
     removeBoardMutation.isPending || updateBoardMutation.isPending;
+
+  const userBoardInfoQuery = useBoardsControllerFindMyBoardPermissions(
+    board.id,
+  );
+  const userBoardInfo =
+    userBoardInfoQuery.data?.status === 200
+      ? userBoardInfoQuery.data.data
+      : undefined;
+
+  const userBoardPermissions = userBoardInfo?.permissions;
+
+  const canRenameBoard = hasBoardPermission(
+    userBoardPermissions,
+    "board_update",
+  );
 
   function handleDeleteBoard() {
     removeBoardMutation.mutate({ boardId: board.id });
@@ -88,9 +108,11 @@ export default function BoardCard({ board }: BoardCardProps) {
                 {board.name}
               </CardTitle>
               <div className="flex items-center gap-1">
-                {board.isOwner ? (
+                {canRenameBoard ? (
                   <EntityActions
                     entityLabel="Board"
+                    canRenameBoard={canRenameBoard}
+                    canDeleteBoard={board.isOwner}
                     entityName={board.name}
                     disabled={isMutating}
                     onEdit={handleStartEdit}
