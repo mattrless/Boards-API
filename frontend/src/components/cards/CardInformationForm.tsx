@@ -21,6 +21,8 @@ import {
 } from "@/lib/schemas/cards/update-entire-card.schema";
 import { useBoardIdParam } from "@/hooks/boards/use-board-id-param";
 import { useUpdateCardMutation } from "@/hooks/cards/use-update-card-mutation";
+import GenerateDescriptionButton from "./GenerateDescriptionButton";
+import CheckDescriptionGrammarButton from "./CheckDescriptionGrammarButton";
 
 export default function CardInformationForm({
   listId,
@@ -42,6 +44,8 @@ export default function CardInformationForm({
   });
 
   const updateCardMutation = useUpdateCardMutation({ boardId, listId });
+  const titleValue = form.watch("title");
+  const descriptionValue = form.watch("description");
 
   useEffect(() => {
     if (!isEditing) {
@@ -115,7 +119,31 @@ export default function CardInformationForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Description</FieldLabel>
+                <div className="flex items-center justify-between gap-2">
+                  <FieldLabel htmlFor={field.name}>Description</FieldLabel>
+                  {isEditing ? (
+                    <div className="flex items-center gap-2">
+                      <GenerateDescriptionButton
+                        title={titleValue}
+                        onGenerateDescription={(description) => {
+                          form.setValue("description", description, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+                        }}
+                      />
+                      <CheckDescriptionGrammarButton
+                        description={descriptionValue}
+                        onCheckDescriptionGrammar={(description) => {
+                          form.setValue("description", description, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+                        }}
+                      />
+                    </div>
+                  ) : null}
+                </div>
                 <textarea
                   {...field}
                   id={field.name}

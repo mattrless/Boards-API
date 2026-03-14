@@ -134,3 +134,18 @@
     display: none;
   }
 }
+
+@keyframes rainbow-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@layer utilities {
+  .animate-rainbow-shift {
+    animation: rainbow-shift 2s linear infinite;
+  }
+}
