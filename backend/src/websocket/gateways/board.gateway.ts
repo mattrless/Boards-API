@@ -59,16 +59,15 @@ export class BoardGateway
 
   private extractToken(client: WsSocket): string | null {
     const authorization = client.handshake.headers.authorization;
-    if (!authorization) {
-      return this.extractTokenFromCookie(client);
+    if (authorization) {
+      const [type, token] = authorization.split(" ");
+      if (type === "Bearer" && token) return token;
     }
 
-    const [type, token] = authorization.split(" ");
-    if (type !== "Bearer" || !token) {
-      return this.extractTokenFromCookie(client);
-    }
+    const authToken = (client.handshake.auth as Record<string, unknown>)?.token;
+    if (authToken && typeof authToken === "string") return authToken;
 
-    return token;
+    return this.extractTokenFromCookie(client);
   }
 
   private extractTokenFromCookie(client: WsSocket): string | null {

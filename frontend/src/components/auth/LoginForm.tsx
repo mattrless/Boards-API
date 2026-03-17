@@ -61,7 +61,7 @@ export default function LoginForm() {
           {
             onSuccess: () => {
               queryClient.removeQueries({ queryKey: ["auth", "me"] });
-              toast.success("Wellcome!");
+              toast.success("Welcome!");
               router.push("/boards");
             },
           },

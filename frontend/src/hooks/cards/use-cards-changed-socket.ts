@@ -1,14 +1,14 @@
 "use client";
-
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { io } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { getCardsControllerFindAllQueryKey } from "@/lib/api/generated/cards/cards";
 import {
   CardCreatedUpdatedEvent,
   CardDeletedEvent,
   CardMovedEvent,
 } from "@/lib/types/card-events";
+import { createAuthenticatedSocket } from "@/lib/utils/socket";
 
 export function useCardsChangedSocket(boardId: number) {
   const queryClient = useQueryClient();
@@ -17,18 +17,12 @@ export function useCardsChangedSocket(boardId: number) {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     if (!apiUrl) return;
 
-    const socket = io(apiUrl, {
-      withCredentials: true,
-    });
-
-    socket.on("connect", () => {
-      socket.emit("board:join", { boardId });
-    });
+    let socket: Socket;
+    let cancelled = false;
 
     const handleCardMoved = async (payload: CardMovedEvent) => {
       const targetListId = payload.listId;
       const sourceListId = payload.sourceListId;
-
       await queryClient.invalidateQueries({
         queryKey: getCardsControllerFindAllQueryKey(boardId, targetListId),
       });
@@ -57,21 +51,32 @@ export function useCardsChangedSocket(boardId: number) {
       });
     };
 
-    socket.on("card:moved", handleCardMoved);
-    socket.on("card:created", handleCardCreated);
-    socket.on("card:updated", handleCardUpdated);
-    socket.on("card:deleted", handleCardDeleted);
+    createAuthenticatedSocket(apiUrl).then((s) => {
+      if (!s || cancelled) {
+        s?.disconnect();
+        return;
+      }
+      socket = s;
+
+      socket.on("connect", () => {
+        socket.emit("board:join", { boardId });
+      });
+
+      socket.on("card:moved", handleCardMoved);
+      socket.on("card:created", handleCardCreated);
+      socket.on("card:updated", handleCardUpdated);
+      socket.on("card:deleted", handleCardDeleted);
+    });
 
     return () => {
-      socket.off("connect");
-      socket.off("card:moved", handleCardMoved);
-      socket.off("card:created", handleCardCreated);
-      socket.off("card:updated", handleCardUpdated);
-      socket.off("card:deleted", handleCardDeleted);
-      if (socket.connected) {
-        socket.emit("board:leave", { boardId });
-      }
-      socket.disconnect();
+      cancelled = true;
+      socket?.off("connect");
+      socket?.off("card:moved", handleCardMoved);
+      socket?.off("card:created", handleCardCreated);
+      socket?.off("card:updated", handleCardUpdated);
+      socket?.off("card:deleted", handleCardDeleted);
+      if (socket?.connected) socket.emit("board:leave", { boardId });
+      socket?.disconnect();
     };
   }, [boardId, queryClient]);
 }

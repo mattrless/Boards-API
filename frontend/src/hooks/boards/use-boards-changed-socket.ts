@@ -1,22 +1,23 @@
 "use client";
-
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { io } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import {
   getBoardsControllerFindMyBoardPermissionsQueryKey,
   getBoardsControllerFindMyBoardsQueryKey,
 } from "@/lib/api/generated/boards/boards";
 import { BoardChangedEvent } from "@/lib/types/board-events";
+import { createAuthenticatedSocket } from "@/lib/utils/socket";
 
 type UseBoardsChangedSocketOptions = {
   currentBoardId?: number;
   onBoardDeleted?: (payload: BoardChangedEvent) => void;
 };
 
-export function useBoardsChangedSocket(options?: UseBoardsChangedSocketOptions) {
+export function useBoardsChangedSocket(
+  options?: UseBoardsChangedSocketOptions,
+) {
   const queryClient = useQueryClient();
-
   const currentBoardId = options?.currentBoardId;
   const onBoardDeleted = options?.onBoardDeleted;
 
@@ -24,14 +25,8 @@ export function useBoardsChangedSocket(options?: UseBoardsChangedSocketOptions) 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     if (!apiUrl) return;
 
-    const socket = io(apiUrl, {
-      withCredentials: true,
-      transports: ["websocket"],
-    });
-
-    socket.on("connect", () => {
-      socket.emit("user:join");
-    });
+    let socket: Socket;
+    let cancelled = false;
 
     const invalidateBoards = async (payload: BoardChangedEvent) => {
       queryClient.invalidateQueries({
@@ -42,7 +37,6 @@ export function useBoardsChangedSocket(options?: UseBoardsChangedSocketOptions) 
           payload.boardId,
         ),
       });
-
       if (
         payload.reason === "board:deleted" &&
         currentBoardId !== undefined &&
@@ -52,12 +46,25 @@ export function useBoardsChangedSocket(options?: UseBoardsChangedSocketOptions) 
       }
     };
 
-    socket.on("boards:changed", invalidateBoards);
+    createAuthenticatedSocket(apiUrl).then((s) => {
+      if (!s || cancelled) {
+        s?.disconnect();
+        return;
+      }
+      socket = s;
+
+      socket.on("connect", () => {
+        socket.emit("user:join");
+      });
+
+      socket.on("boards:changed", invalidateBoards);
+    });
 
     return () => {
-      socket.off("connect");
-      socket.off("boards:changed", invalidateBoards);
-      socket.disconnect();
+      cancelled = true;
+      socket?.off("connect");
+      socket?.off("boards:changed", invalidateBoards);
+      socket?.disconnect();
     };
   }, [queryClient, currentBoardId, onBoardDeleted]);
 }
