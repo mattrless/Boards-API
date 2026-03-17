@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   cookieStore.set(AUTH_TOKEN_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "none",
     path: "/",
     maxAge: 60 * 60 * 24,
   });
