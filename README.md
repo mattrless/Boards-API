@@ -2,17 +2,17 @@
 
 Boards is a Trello‑style app for creating boards, lists, and cards. Each board has lists, cards, admin and member roles; you can add users to your boards, promote them to admin or demote them to member. Cards can have assigned members. Admins can drag and reorder lists and cards, while members can only drag and reorder cards.
 
-This is a monorepo with a NestJS backend and a Next.js frontend for the Boards app.
+![demo](./git-assets/demo.gif)
+[Backend](./backend/README.md)
+[Frontend](./frontend/README.md)
 
 ## Structure
+
+This repo includes a Developer Container configuration with a monorepo.
 
 - `backend/`: NestJS API, Prisma, WebSocket gateway, AI module
 - `frontend/`: Next.js UI, React Query, Orval-generated API clients
 - `docker-compose.yml`: local dev services (Postgres + dev container)
-
-## Development Container
-
-This repo includes a Dev Container configuration. Easy to use with VS Code Extension.
 
 ## Requirements
 
