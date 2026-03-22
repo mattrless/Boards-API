@@ -15,6 +15,7 @@ import { useUpdateCardPositionMutation } from "@/hooks/cards/use-update-position
 import { getCardsControllerFindAllQueryKey } from "@/lib/api/generated/cards/cards";
 import { useQueryClient } from "@tanstack/react-query";
 import onDragEnd from "@/lib/utils/onDragEnd";
+import { toast } from "sonner";
 
 export default function ListGrid({
   lists,
@@ -57,6 +58,7 @@ export default function ListGrid({
           !hasBoardPermission(userBoardPermissions, "list_update")
         ) {
           event.preventDefault();
+          toast.info("Members can't move lists");
         }
 
         if (

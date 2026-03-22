@@ -29,6 +29,7 @@ import { useState } from "react";
 declare module "@tanstack/react-table" {
   interface TableMeta<TData> {
     currentUserId?: number;
+    currentUserIsOwner?: boolean;
     boardId: number;
   }
 }
@@ -91,7 +92,7 @@ const columns: ColumnDef<BoardMemberResponseDto>[] = [
     accessorFn: (member) => member.user.profile?.name ?? "",
     header: "Name",
     cell: ({ getValue }) => (
-      <span className="block max-w-35 truncate font-medium">
+      <span className="block max-w-[8rem] truncate font-medium sm:max-w-[12rem]">
         {String(getValue())}
       </span>
     ),
@@ -101,7 +102,9 @@ const columns: ColumnDef<BoardMemberResponseDto>[] = [
     accessorFn: (member) => member.user.email ?? "",
     header: "Email",
     cell: ({ getValue }) => (
-      <span className="block max-w-45 truncate">{String(getValue())}</span>
+      <span className="block max-w-[10rem] truncate sm:max-w-[14rem]">
+        {String(getValue())}
+      </span>
     ),
   },
   {
@@ -118,14 +121,17 @@ const columns: ColumnDef<BoardMemberResponseDto>[] = [
     header: "Actions",
     cell: ({ row, table }) => {
       const currentUserId = table.options.meta?.currentUserId;
+      const currentUserIsOwner = table.options.meta?.currentUserIsOwner;
       const boardId = table.options.meta!.boardId;
       if (row.original.isOwner) return null;
       if (currentUserId && row.original.user.id === currentUserId) return null;
 
       return (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex min-w-[14rem] flex-wrap items-center gap-2">
           <ChangeRoleButton boardId={boardId} member={row.original} />
-          <TransferOwnershipButton boardId={boardId} member={row.original} />
+          {currentUserIsOwner ? (
+            <TransferOwnershipButton boardId={boardId} member={row.original} />
+          ) : null}
           <RemoveFromBoardButton boardId={boardId} member={row.original} />
         </div>
       );
@@ -146,6 +152,10 @@ export default function BoardMembersDataTable({
     pageSize: 5,
   });
 
+  const currentUserIsOwner = members.some(
+    (member) => member.user.id === currentUserId && member.isOwner,
+  );
+
   const table = useReactTable({
     data: members,
     columns,
@@ -157,6 +167,7 @@ export default function BoardMembersDataTable({
     onPaginationChange: setPagination,
     meta: {
       currentUserId,
+      currentUserIsOwner,
       boardId,
     },
     state: {
@@ -167,16 +178,16 @@ export default function BoardMembersDataTable({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-center">
+      <div className="flex w-full items-center justify-center">
         <Input
           placeholder="Filter by name or email..."
           value={globalFilter}
           onChange={(event) => setGlobalFilter(event.target.value)}
-          className="max-w-sm"
+          className="w-full sm:max-w-sm"
         />
       </div>
-      <div className="overflow-hidden rounded-md border">
-        <Table className="[&_td]:py-1 [&_th]:py-1">
+      <div className="overflow-x-auto rounded-md border">
+        <Table className="min-w-[42rem] [&_td]:py-1 [&_th]:py-1">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -220,10 +231,11 @@ export default function BoardMembersDataTable({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
         <Button
           variant="outline"
           size="sm"
+          className="w-full sm:w-auto"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
@@ -232,6 +244,7 @@ export default function BoardMembersDataTable({
         <Button
           variant="outline"
           size="sm"
+          className="w-full sm:w-auto"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >

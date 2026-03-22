@@ -38,8 +38,8 @@ export default function GeneralBoardSettingsTab({
   }
 
   return (
-    <div className="flex gap-2 flex-col">
-      <Card className="px-6">
+    <div className="flex flex-col gap-2">
+      <Card className="px-3 py-3 sm:px-6">
         <BoardNameEditorForm
           initialName={board.name}
           isPending={updateBoardMutation.isPending}
@@ -49,7 +49,7 @@ export default function GeneralBoardSettingsTab({
           showCancel={false}
         />
       </Card>
-      <Card className="px-6">
+      <Card className="px-3 py-3 sm:px-6">
         <DeleteBoardButton
           boardId={board.id}
           disabled={!board.isOwner}

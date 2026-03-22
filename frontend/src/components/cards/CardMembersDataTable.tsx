@@ -165,7 +165,7 @@ export default function CardMembersDataTable({
         header: "Name",
         accessorFn: (member) => member.user.profile?.name ?? "",
         cell: ({ getValue }) => (
-          <span className="block max-w-45 truncate font-medium">
+          <span className="block max-w-[9rem] truncate font-medium sm:max-w-[13rem]">
             {String(getValue())}
           </span>
         ),
@@ -214,8 +214,8 @@ export default function CardMembersDataTable({
 
   return (
     <div className="space-y-3">
-      <div className="overflow-hidden rounded-md border">
-        <Table className="[&_td]:py-1 [&_th]:py-1">
+      <div className="overflow-x-auto rounded-md border">
+        <Table className="min-w-[18rem] [&_td]:py-1 [&_th]:py-1">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -265,6 +265,7 @@ export default function CardMembersDataTable({
             type="button"
             variant="outline"
             size="sm"
+            className="w-full sm:w-auto"
             onClick={() => {
               handleJoinLeaveCard();
             }}

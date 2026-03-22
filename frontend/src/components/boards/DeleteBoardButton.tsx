@@ -50,6 +50,7 @@ export default function DeleteBoardButton({
       <Button
         variant="destructive"
         disabled={disabled}
+        className="w-full sm:w-auto"
         onClick={() => {
           openDeleteDialog();
         }}
@@ -70,12 +71,13 @@ export default function DeleteBoardButton({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={closeDeleteDialog}>
+            <AlertDialogCancel onClick={closeDeleteDialog} className="w-full sm:w-auto">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               disabled={disabled}
+              className="w-full sm:w-auto"
               onClick={handleDelete}
             >
               Delete

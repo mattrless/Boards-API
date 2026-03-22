@@ -46,6 +46,7 @@ export default function DeleteCardButton({
       variant={"destructive"}
       onClick={handleDeleteCard}
       disabled={deleteCardMutation.isPending}
+      className="w-full sm:w-auto"
     >
       Delete card
     </Button>

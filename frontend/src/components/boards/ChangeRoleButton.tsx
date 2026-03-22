@@ -31,6 +31,9 @@ export default function ChangeRoleButton({
           });
           return;
         }
+        if (res.status === 409) {
+          toast.info("Can't degrade another admin");
+        }
       },
       onError: () => {
         toast.error("Something went wrong");

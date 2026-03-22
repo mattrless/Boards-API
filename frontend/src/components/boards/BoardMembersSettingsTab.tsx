@@ -44,19 +44,18 @@ export default function BoardMembersSettingsTab({
     });
   }
 
-  const meQueryDataId = useMeQuery().data?.id;
-  if (!meQueryDataId) return;
-  const currentUserId = meQueryDataId;
+  const currentUserId = useMeQuery().data?.id;
 
   const membersQueryData = useBoardMembersControllerFindBoardMembers(board.id)
     .data?.data;
-  if (!membersQueryData) return;
 
-  const boardMembers: BoardMemberResponseDto[] = membersQueryData;
+  const boardMembers: BoardMemberResponseDto[] = Array.isArray(membersQueryData)
+    ? membersQueryData
+    : [];
 
   return (
-    <div className="flex gap-2 flex-col">
-      <Card className="px-6">
+    <div className="flex flex-col gap-2">
+      <Card className="px-3 py-3 sm:px-6">
         <AddBoardMemberForm
           isPending={addBoardMemberMutation.isPending}
           submitError={submitError}
@@ -64,11 +63,11 @@ export default function BoardMembersSettingsTab({
           resetSignal={resetSignal}
         />
       </Card>
-      <Card className="px-6">
+      <Card className="px-3 py-3 sm:px-6">
         <BoardMembersDataTable
           boardId={board.id}
           members={boardMembers}
-          currentUserId={currentUserId}
+          currentUserId={currentUserId ?? 0}
         />
       </Card>
     </div>

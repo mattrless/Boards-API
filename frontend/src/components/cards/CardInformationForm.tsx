@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
@@ -85,7 +84,7 @@ export default function CardInformationForm({
   }
 
   return (
-    <Card className="p-4">
+    <Card className="p-3 sm:p-4">
       <form
         className="flex flex-col gap-4"
         onSubmit={form.handleSubmit(onSubmit)}
@@ -119,10 +118,10 @@ export default function CardInformationForm({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <FieldLabel htmlFor={field.name}>Description</FieldLabel>
                   {isEditing ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
                       <GenerateDescriptionButton
                         title={titleValue}
                         onGenerateDescription={(description) => {
@@ -152,7 +151,7 @@ export default function CardInformationForm({
                   aria-disabled={!isEditing}
                   onClick={handleStartEdit}
                   tabIndex={isEditing ? 0 : -1}
-                  className={`border-input placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex min-h-28 w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] ${
+                  className={`border-input placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex min-h-28 w-full min-w-0 resize-y rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] ${
                     !isEditing ? "cursor-text opacity-100" : ""
                   }`}
                 />
@@ -164,11 +163,11 @@ export default function CardInformationForm({
           />
 
           {isEditing ? (
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={handleCancel}>
+            <div className="flex flex-col-reverse justify-end gap-2 sm:flex-row">
+              <Button type="button" variant="outline" onClick={handleCancel} className="w-full sm:w-auto">
                 Cancel
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit" className="w-full sm:w-auto">Save</Button>
             </div>
           ) : null}
         </FieldGroup>

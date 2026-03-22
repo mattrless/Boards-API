@@ -52,23 +52,25 @@ export default function BoardSettingsDialog({
         </Tooltip>
       </TooltipProvider>
 
-      <DialogContent className="max-h-[85vh] overflow-hidden p-4 sm:max-w-4xl sm:p-6">
+      <DialogContent className="max-h-[90vh] overflow-y-auto p-3 sm:max-w-4xl sm:p-6">
         <DialogHeader>
-          <DialogTitle className="truncate">{board.name} settings</DialogTitle>
+          <DialogTitle className="truncate text-base sm:text-lg">
+            {board.name} settings
+          </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="tab-general" className="min-h-0 gap-4">
-          <div className="w-full">
-            <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:inline-flex sm:h-9 sm:w-fit">
+        <Tabs defaultValue="tab-general" className="min-h-0 gap-3 sm:gap-4">
+          <div className="flex w-full justify-center">
+            <TabsList className="inline-flex h-auto w-fit max-w-full items-center gap-1 rounded-lg px-1 py-1">
               <TabsTrigger
                 value="tab-general"
-                className="min-w-0 px-3 py-2 text-xs sm:text-sm"
+                className="min-w-[7.5rem] px-3 py-2 text-xs whitespace-nowrap sm:min-w-[8.5rem] sm:text-sm"
               >
                 General
               </TabsTrigger>
               <TabsTrigger
                 value="tab-members"
-                className="min-w-0 px-3 py-2 text-xs sm:text-sm"
+                className="min-w-[7.5rem] px-3 py-2 text-xs whitespace-nowrap sm:min-w-[8.5rem] sm:text-sm"
               >
                 Members
               </TabsTrigger>
@@ -77,13 +79,13 @@ export default function BoardSettingsDialog({
 
           <TabsContent
             value="tab-general"
-            className="max-h-[calc(85vh-12rem)] overflow-y-auto pr-1"
+            className="max-h-[calc(90vh-11rem)] overflow-y-auto pr-1"
           >
             <GeneralBoardSettingsTab board={board} />
           </TabsContent>
           <TabsContent
             value="tab-members"
-            className="max-h-[calc(85vh-12rem)] overflow-y-auto pr-1"
+            className="max-h-[calc(90vh-11rem)] overflow-y-auto pr-1"
           >
             <BoardMembersSettingsTab board={board} />
           </TabsContent>

@@ -47,13 +47,13 @@ export default function CardItemDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogTitle></DialogTitle>
-      <DialogContent className="sm:max-w-4xl">
-        <div className="grid grid-cols-2 gap-2">
-          <div className="row-span-2">
+      <DialogContent className="max-h-[90vh] overflow-y-auto p-3 sm:max-w-4xl sm:p-6">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+          <div className="min-w-0">
             <CardInformationForm card={card} listId={listId} />
           </div>
-          <div className="flex flex-col gap-2">
-            <h2 className="text-center text-lg font-semibold tracking-tight">
+          <div className="min-w-0 space-y-2">
+            <h2 className="text-center text-base font-semibold tracking-tight sm:text-lg">
               Card Members
             </h2>
             <CardMembersDataTable
